@@ -3,7 +3,7 @@
 import "../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
 import { PatternList } from "@/components/pattern_list"
-import { Plus, Search } from "lucide-react"
+import { Plus, Search, Shapes } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -15,7 +15,12 @@ export default function PatternsListPage() {
       <Sidebar />
       <main className="processMain">
         <div className="processHeader">
-          <h1 className="heroTitle">Patrones</h1>
+          <div className="processTitleRow">
+            <div className="catIconCircle small">
+              <Shapes className="w-5 h-5 text-white" strokeWidth={2} /> 
+            </div>
+            <h1 className="heroTitle m-0">Thinklets</h1>
+          </div>
           <p>Consulta, busca o crea nuevos patrones colaborativos.</p>
         </div>
 

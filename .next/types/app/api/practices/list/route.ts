@@ -1,4 +1,4 @@
-// File: D:\ChildPrograming\Frontend\ChildProgramming_Frontend\src\app\api\practices\list\route.ts
+// File: C:\Users\ACER\Desktop\Ing. De Sistemas\ChildProgramming - pasantía\child_programming_frontend\src\app\api\practices\list\route.ts
 import * as entry from '../../../../../../src/app/api/practices/list/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -16,11 +16,17 @@ export default function ActivitiesListPage() {
 
       <main className="processMain">
         <div className="processHeader">
-          <h1 className="text-2xl font-bold text-gray-900">Actividades</h1>
+          <div className="processTitleRow">
+            <div className="catIconCircle small">
+              <img src="/whitetask.svg" alt="Icono de actividades" />
+            </div>
+            <h1 className="heroTitle m-0">Actividades</h1>
+          </div>
           <p className="text-gray-600">
             Consulta, busca o crea nuevas actividades colaborativas.
           </p>
         </div>
+
 
         <div className="actionBar">
           <div className="searchContainer">

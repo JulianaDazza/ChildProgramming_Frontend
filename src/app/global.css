@@ -443,9 +443,16 @@
 .sidebarHeader {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebarHeader h2 {
+  font-size: 1rem;
   font-weight: 600;
+  color: #f8fafc;
 }
 
 .sidebarNav {
@@ -453,6 +460,58 @@
   flex-direction: column;
   gap: 0.75rem;
 }
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.collapseButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cbd5e1;
+  padding: 10px 16px;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.navLink.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}
+
+.navText {
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
 
 .navItem {
   padding: 0.5rem 1.2rem;
@@ -490,8 +549,12 @@
 }
 
 .processHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centra el conjunto horizontalmente */
+  justify-content: center;
+  margin-top: 2rem; /* 🔹 baja el bloque del encabezado */
   text-align: center;
-  margin-bottom: 2rem;
 }
 
 .processTitle {
@@ -514,6 +577,10 @@
 .processHeader p {
   color: #4b5563;
   font-size: 1rem;
+}
+
+.processHeader .flex {
+  justify-content: center; /* centra icono + texto en una línea */
 }
 
 /* Formulario */
@@ -713,4 +780,141 @@ select option {
   color: #111827;
   background-color: #fff;
   font-size: 1rem;
+}
+
+/* === Modal de confirmación === */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(2px);
+}
+
+.modalBox {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.25s ease;
+}
+
+.modalTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 0.75rem;
+}
+
+.modalMessage {
+  color: #374151;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modalButton {
+  padding: 0.6rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.modalButton.cancel {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.modalButton.cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.modalButton.confirm {
+  background-color: #2563eb;
+  color: white;
+}
+
+.modalButton.confirm:hover {
+  background-color: #1d4ed8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cardIconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+}
+
+.cardIconCircle img {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+}
+
+/* 🔹 Fila de título con ícono y texto */
+.processTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centra horizontalmente */
+  gap: 0.75rem; /* espacio entre el icono y el texto */
+  margin-bottom: 0.5rem;
+}
+
+/* 🔹 Hace el ícono más pequeño (ajustado al texto) */
+.catIconCircle.small {
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+}
+
+.catIconCircle.small img {
+  width: 16px;
+  height: 16px;
+}
+
+.processTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.catIconCircle.small {
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: #3b82f6; /* azul brillante */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

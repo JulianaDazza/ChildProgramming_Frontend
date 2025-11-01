@@ -13,10 +13,20 @@ export default function PracticesListPage() {
   return (
     <div className="processContainer">
       <Sidebar />
+
       <main className="processMain">
+        {/* 🔹 Encabezado con ícono + título */}
         <div className="processHeader">
-          <h1 className="heroTitle">Prácticas</h1>
-          <p>Consulta, busca o crea nuevas prácticas colaborativas.</p>
+          <div className="processTitleRow">
+            <div className="catIconCircle small">
+              <img src="/document.svg" alt="Icono de prácticas" />
+            </div>
+            <h1 className="heroTitle m-0">Prácticas</h1>
+          </div>
+
+          <p className="text-gray-600">
+            Consulta, busca o crea nuevas prácticas colaborativas.
+          </p>
         </div>
 
         <div className="actionBar">

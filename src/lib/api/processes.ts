@@ -8,12 +8,6 @@ export async function getProcesses(): Promise<Process[]> {
   return response.json();
 }
 
-export async function getProcess(id: number): Promise<Process> {
-  const response = await fetch(`${API_BASE_URL}/api/collaborative_process/find/${id}`);
-  if (!response.ok) throw new Error("Failed to fetch process");
-  return response.json();
-}
-
 export async function createProcess(data: {
   name_process: string;
   description_process: string;
@@ -21,7 +15,7 @@ export async function createProcess(data: {
   image?: string;
   facilitator_id: number;
 }): Promise<Process> {
-  const response = await fetch(`${API_BASE_URL}/api/collaborative_process/create`, {
+  const response = await fetch(`${API_BASE_URL}/api/colaborative_process/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -31,7 +25,7 @@ export async function createProcess(data: {
 }
 
 export async function updateProcess(id: number, data: Partial<Process>): Promise<Process> {
-  const response = await fetch(`${API_BASE_URL}/api/collaborative_process/update/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/colaborative_process/update/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -41,7 +35,7 @@ export async function updateProcess(id: number, data: Partial<Process>): Promise
 }
 
 export async function deleteProcess(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/collaborative_process/delete/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/colaborative_process/delete/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) throw new Error("Failed to delete process");

@@ -1,8 +1,8 @@
 {
-  "/api/thinklets/list/route": "app/api/thinklets/list/route.js",
-  "/practices/edit/[id]/page": "app/practices/edit/[id]/page.js",
+  "/api/patterns/list/route": "app/api/patterns/list/route.js",
+  "/page": "app/page.js",
+  "/roles/list/page": "app/roles/list/page.js",
+  "/practices/list/page": "app/practices/list/page.js",
   "/thinklets/list/page": "app/thinklets/list/page.js",
-  "/patterns/list/page": "app/patterns/list/page.js",
-  "/patterns/edit/[id]/page": "app/patterns/edit/[id]/page.js",
-  "/thinklets/edit/[id]/page": "app/thinklets/edit/[id]/page.js"
+  "/patterns/list/page": "app/patterns/list/page.js"
 }

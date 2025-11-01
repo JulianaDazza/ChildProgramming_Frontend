@@ -1,4 +1,4 @@
-// File: D:\ChildPrograming\Frontend\ChildProgramming_Frontend\src\app\layout.tsx
+// File: C:\Users\ACER\Desktop\Ing. De Sistemas\ChildProgramming - pasantía\child_programming_frontend\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

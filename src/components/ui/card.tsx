@@ -15,11 +15,24 @@ export function Card({
   );
 }
 
-export function CardHeader({
-  children,
-  className = "",
-}: { children: ReactNode; className?: string }) {
-  return <div className={`mb-2 ${className}`}>{children}</div>;
+interface HeaderProps {
+  children: ReactNode;
+  className?: string;
+  icon?: string; // 🆕 ícono opcional
+  alt?: string;  // texto alternativo opcional
+}
+
+export function CardHeader({ children, className = "", icon, alt }: HeaderProps) {
+  return (
+    <div className={`flex items-center gap-2 mb-2 ${className}`}>
+      {icon && (
+        <div className="cardIconCircle">
+          <img src={icon} alt={alt || "icon"} />
+        </div>
+      )}
+      <div>{children}</div>
+    </div>
+  );
 }
 
 export function CardTitle({

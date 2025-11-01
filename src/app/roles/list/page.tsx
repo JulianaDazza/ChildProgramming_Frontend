@@ -1,9 +1,8 @@
-// src/app/roles/list/page.tsx
 "use client"
 
 import "../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
-import { RoleList } from "@/components/role_list" // ✅ correcto
+import { RoleList } from "@/components/role_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -17,8 +16,17 @@ export default function RolesListPage() {
 
       <main className="processMain">
         <div className="processHeader">
-          <h1 className="heroTitle">Roles</h1>
-          <p>Consulta, busca o crea nuevos roles colaborativos.</p>
+          {/* 🔹 Encabezado con ícono + título */}
+          <div className="processTitleRow">
+            <div className="catIconCircle small">
+              <img src="/iconteam.svg" alt="Icono de roles" />
+            </div>
+            <h1 className="heroTitle m-0">Roles</h1>
+          </div>
+
+          <p className="text-gray-600">
+            Consulta, busca o crea nuevos roles colaborativos.
+          </p>
         </div>
 
         <div className="actionBar">
@@ -39,7 +47,7 @@ export default function RolesListPage() {
           </Link>
         </div>
 
-        <RoleList searchTerm={searchTerm} /> {/* ✅ ya coincide */}
+        <RoleList searchTerm={searchTerm} />
       </main>
     </div>
   )

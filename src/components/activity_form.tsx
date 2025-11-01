@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { RefreshCcw } from "lucide-react"
+import { ListTodo, RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../app/global.css"
 import { Sidebar } from "./ui/sidebar"
@@ -85,7 +85,6 @@ export function ActivityForm() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
             <h1>Crear Nueva Actividad</h1>
           </div>
           <p>Completa la información para registrar una nueva actividad infantil</p>
