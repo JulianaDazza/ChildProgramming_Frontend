@@ -10,8 +10,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <div style={{ display: "flex" }}>
-          <main style={{ flex: 1 }}>{children}</main>
+        <div className="layoutContainer">
+          <Sidebar />
+          <main className="layoutMain">{children}</main>
         </div>
         <Toaster />
       </body>

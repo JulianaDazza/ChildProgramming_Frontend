@@ -28,6 +28,7 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
       if (!response.ok) throw new Error("Error al obtener thinklets")
       const data = await response.json()
       setThinklets(data)
+      setError(null)
     } catch {
       setError("Error al cargar los thinklets")
     } finally {
@@ -42,22 +43,36 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
 
   const confirmDelete = async () => {
     if (!selectedId) return
-    await fetch(`http://localhost:8080/api/thinklet/delete/${selectedId}`, { method: "DELETE" })
-    setConfirmOpen(false)
-    setSelectedId(null)
-    fetchThinklets()
+    try {
+      await fetch(`http://localhost:8080/api/thinklet/delete/${selectedId}`, { method: "DELETE" })
+      await fetchThinklets()
+    } catch {
+      alert("Error al eliminar el thinklet")
+    } finally {
+      setConfirmOpen(false)
+      setSelectedId(null)
+    }
   }
 
   const normalize = (t?: string) =>
     (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+
   const filtered = thinklets.filter(
     (t) =>
       normalize(t.name_thinklet).includes(normalize(searchTerm)) ||
       normalize(t.description_thinklet).includes(normalize(searchTerm))
   )
 
-  if (loading) return <p className="text-center py-10 text-blue-600">Cargando thinklets...</p>
-  if (error) return <p className="text-center py-10 text-red-500">{error}</p>
+  if (loading) return <p className="text-center py-10 text-blue-600 text-lg">Cargando thinklets...</p>
+  if (error)
+    return (
+      <div className="text-center py-10 text-red-500 text-lg">
+        {error}
+        <button className="processButton view ml-4" onClick={fetchThinklets}>
+          Reintentar
+        </button>
+      </div>
+    )
   if (thinklets.length === 0)
     return <p className="text-center py-10 text-gray-500">No existen thinklets todavía.</p>
 
@@ -67,8 +82,12 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
         {filtered.map((thinklet) => (
           <div key={thinklet.id_thinklet} className="processCardContainer">
             <div className="flex flex-col items-center p-6">
-              <h2 className="text-lg font-semibold">{thinklet.name_thinklet}</h2>
-              <p className="text-gray-600 mb-4">{thinklet.description_thinklet}</p>
+              <div className="catIconCircle">
+                <img src="/caticon.svg" alt="Cat Icon" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">{thinklet.name_thinklet}</h2>
+              <p className="text-gray-700 mb-4">{thinklet.description_thinklet}</p>
+
               <div className="processButtonGroup">
                 <Link href={`/thinklets/${thinklet.id_thinklet}`}>
                   <button className="processButton view">
