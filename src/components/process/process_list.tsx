@@ -96,7 +96,7 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
                 <Link href={`/procesos/${process.id_process}`}>
                   <button className="processButton view"><Eye className="h-4 w-4" />Ver</button>
                 </Link>
-                <Link href={`/procesos/${process.id_process}/editar`}>
+                <Link href={`/process/edit/${process.id_process}`}>
                   <button className="processButton edit"><Edit className="h-4 w-4" />Editar</button>
                 </Link>
                 <button className="processButton pdf" onClick={() => handleDownload(process)}>

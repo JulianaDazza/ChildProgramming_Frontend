@@ -459,6 +459,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  margin-top: 10px;
 }
 
 .sidebar.collapsed {
@@ -474,11 +475,6 @@
   align-items: center;
 }
 
-.sidebarNav {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-}
 .navLink {
   display: flex;
   align-items: center;
@@ -917,4 +913,20 @@ select option {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* === Contenedor general === */
+.layoutContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* === Contenido principal al lado derecho del sidebar === */
+.layoutMain {
+  margin-left: 230px; /* ← Igual al ancho de tu sidebar */
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9fafb;
+  overflow-x: hidden;
 }

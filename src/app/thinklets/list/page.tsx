@@ -19,7 +19,7 @@ export default function ThinkletsListPage() {
         <div className="processHeader">
           <div className="processTitleRow">
             <div className="catIconCircle small">
-              <Lightbulb className="w-5 h-5 text-white" strokeWidth={2} /> 
+              <Lightbulb className="w-5 h-5" stroke="white" strokeWidth={2} /> 
             </div>
             <h1 className="heroTitle m-0">Thinklets</h1>
           </div>
