@@ -6,10 +6,18 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../app/global.css"
 import { Sidebar } from "./ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export function PracticeForm() {
   const router = useRouter()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
+
+  // Estado de errores
+  const [errors, setErrors] = useState({
+    name_practice: false,
+    type_practice: false,
+  })
 
   const [formData, setFormData] = useState({
     name_practice: "",
@@ -19,8 +27,29 @@ export function PracticeForm() {
 
   const practiceTypes = ["COGNITIVA", "AGIL", "COLABORATIVA"]
 
+  // 🔹 Maneja los cambios
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    // 🔹 Quita el error visual si el usuario empieza a escribir
+    setErrors({ ...errors, [field]: false })
+  }
+
+  // 🔹 Enviar formulario
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const newErrors = {
+      name_practice: !formData.name_practice.trim(),
+      type_practice: !formData.type_practice.trim(),
+    }
+
+    // 🔹 Mostrar advertencia si hay errores
+    if (newErrors.name_practice || newErrors.type_practice) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -31,14 +60,15 @@ export function PracticeForm() {
       })
 
       if (response.ok) {
+        toastSuccess("Práctica creada correctamente")
         router.push("/practices/list")
       } else {
         const errorText = await response.text()
-        alert("Error al crear la práctica: " + errorText)
+        toastError(`Error al crear la práctica: ${errorText}`)
       }
     } catch (error) {
       console.error("Error creando práctica:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -57,16 +87,15 @@ export function PracticeForm() {
           <p>Completa la información para registrar una nueva práctica</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="processForm space-y-5">
-          {/* Nombre */}
+        <form onSubmit={handleSubmit} className="processForm">
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre de la práctica: *</label>
             <input
               type="text"
-              required
               value={formData.name_practice}
-              onChange={(e) => setFormData({ ...formData, name_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("name_practice", e.target.value)}
+              className={`formInput ${errors.name_practice ? "inputError" : ""}`}
             />
           </div>
 
@@ -76,19 +105,18 @@ export function PracticeForm() {
             <input
               type="text"
               value={formData.description_practice}
-              onChange={(e) => setFormData({ ...formData, description_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("description_practice", e.target.value)}
+              className="formInput"
             />
           </div>
 
-          {/* Tipo de práctica */}
+          {/* Tipo obligatorio */}
           <div className="formRow">
             <label>Tipo de práctica: *</label>
             <select
-              required
               value={formData.type_practice}
-              onChange={(e) => setFormData({ ...formData, type_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("type_practice", e.target.value)}
+              className={`formInput ${errors.type_practice ? "inputError" : ""}`}
             >
               <option value="">Selecciona un tipo</option>
               {practiceTypes.map((type) => (
@@ -101,20 +129,12 @@ export function PracticeForm() {
 
           {/* Botones */}
           <div className="buttonGroup flex justify-between mt-6">
-            <Link href="/practices">
-              <button
-                type="button"
-                className="btnVolver border-2 border-blue-600 text-blue-600 font-semibold px-6 py-2 rounded-2xl hover:bg-blue-50 transition"
-              >
+            <Link href="/practices/list">
+              <button type="button" className="btnVolver">
                 Volver
               </button>
             </Link>
-
-            <button
-              type="submit"
-              className="btnCrear bg-blue-600 text-white font-semibold px-6 py-2 rounded-2xl hover:bg-blue-700 transition"
-              disabled={loading}
-            >
+            <button type="submit" className="btnCrear" disabled={loading}>
               {loading ? "Creando..." : "Crear Práctica"}
             </button>
           </div>

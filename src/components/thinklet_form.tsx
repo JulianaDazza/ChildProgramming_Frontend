@@ -6,22 +6,27 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../app/global.css"
 import { Sidebar } from "./ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export function ThinkletForm() {
   const router = useRouter()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
 
-  // ✅ Estructura igual al DTO del backend
   const [formData, setFormData] = useState({
     name_thinklet: "",
     description_thinklet: "",
     id_pattern: "",
   })
 
-  // Lista de patrones para el select
+  const [errors, setErrors] = useState({
+    name_thinklet: false,
+    id_pattern: false,
+  })
+
   const [patterns, setPatterns] = useState<any[]>([])
 
-  // Cargar patrones colaborativos
+  // 🔹 Cargar patrones colaborativos
   useEffect(() => {
     const fetchPatterns = async () => {
       try {
@@ -30,13 +35,33 @@ export function ThinkletForm() {
         setPatterns(data)
       } catch (error) {
         console.error("Error cargando patrones:", error)
+        toastError("Error al cargar los patrones")
       }
     }
     fetchPatterns()
   }, [])
 
+  // 🔹 Actualiza valores y limpia errores al escribir
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false })
+  }
+
+  // 🔹 Enviar formulario
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const newErrors = {
+      name_thinklet: !formData.name_thinklet.trim(),
+      id_pattern: !formData.id_pattern.trim(),
+    }
+
+    if (newErrors.name_thinklet || newErrors.id_pattern) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -51,14 +76,15 @@ export function ThinkletForm() {
       })
 
       if (response.ok) {
+        toastSuccess("Thinklet creado correctamente")
         router.push("/thinklets/list")
       } else {
         const errorText = await response.text()
-        alert("Error al crear el thinklet: " + errorText)
+        toastError(`Error al crear el thinklet: ${errorText}`)
       }
     } catch (error) {
       console.error("Error creando thinklet:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -78,14 +104,14 @@ export function ThinkletForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre del thinklet: *</label>
             <input
               type="text"
-              required
               value={formData.name_thinklet}
-              onChange={(e) => setFormData({ ...formData, name_thinklet: e.target.value })}
+              onChange={(e) => handleChange("name_thinklet", e.target.value)}
+              className={`formInput ${errors.name_thinklet ? "inputError" : ""}`}
             />
           </div>
 
@@ -95,17 +121,18 @@ export function ThinkletForm() {
             <input
               type="text"
               value={formData.description_thinklet}
-              onChange={(e) => setFormData({ ...formData, description_thinklet: e.target.value })}
+              onChange={(e) => handleChange("description_thinklet", e.target.value)}
+              className="formInput"
             />
           </div>
 
-          {/* Patrón colaborativo */}
+          {/* Patrón colaborativo obligatorio */}
           <div className="formRow">
             <label>Patrón colaborativo asociado: *</label>
             <select
-              required
               value={formData.id_pattern}
-              onChange={(e) => setFormData({ ...formData, id_pattern: e.target.value })}
+              onChange={(e) => handleChange("id_pattern", e.target.value)}
+              className={`formInput ${errors.id_pattern ? "inputError" : ""}`}
             >
               <option value="">Selecciona un patrón</option>
               {patterns.map((p) => (
@@ -117,12 +144,13 @@ export function ThinkletForm() {
           </div>
 
           {/* Botones */}
-          <div className="buttonGroup">
-            <Link href="/thinklets">
+          <div className="buttonGroup flex justify-between mt-6">
+            <Link href="/thinklets/list">
               <button type="button" className="btnVolver">
                 Volver
               </button>
             </Link>
+
             <button type="submit" className="btnCrear" disabled={loading}>
               {loading ? "Creando..." : "Crear Thinklet"}
             </button>

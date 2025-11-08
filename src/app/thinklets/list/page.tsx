@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { ThinkletList } from "@/components/thinklet_list"
 import { Plus, Search, Lightbulb } from "lucide-react"
 import Link from "next/link"
@@ -11,15 +10,14 @@ export default function ThinkletsListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-
-      <main className="processMain">
-        {/* 🔹 Encabezado con ícono de bombillo */}
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado con ícono de bombillo */}
         <div className="processHeader">
           <div className="processTitleRow">
             <div className="catIconCircle small">
-              <Lightbulb className="w-5 h-5" stroke="white" strokeWidth={2} /> 
+              <Lightbulb className="w-5 h-5" stroke="white" strokeWidth={2} />
             </div>
             <h1 className="heroTitle m-0">Thinklets</h1>
           </div>
@@ -50,7 +48,7 @@ export default function ThinkletsListPage() {
 
         {/* 🧩 Lista de thinklets */}
         <ThinkletList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

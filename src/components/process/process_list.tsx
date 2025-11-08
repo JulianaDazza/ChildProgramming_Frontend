@@ -7,6 +7,7 @@ import { getProcesses } from "../../lib/api/processes"
 import { generateProcessPDF } from "../../lib/pdf_generator"
 import type { Process } from "../../lib/types"
 import { ConfirmModal } from "../ui/confirmModal"
+import { useAppToast } from "@/hooks/useAppToast" // 👈 importamos el hook
 
 export function Process_list({ searchTerm }: { searchTerm?: string }) {
   const [processes, setProcesses] = useState<Process[]>([])
@@ -14,6 +15,9 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+
+  // 👇 Inicializamos los toasts personalizados
+  const { toastSuccess, toastError,toastInfo } = useAppToast()
 
   useEffect(() => {
     fetchProcesses()
@@ -24,8 +28,10 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
       const data = await getProcesses()
       setProcesses(data)
       setError(null)
-    } catch {
+    } catch (err) {
+      console.error("Error al cargar procesos:", err)
       setError("Error al cargar los procesos")
+      toastError("❌ No se pudieron cargar los procesos")
     } finally {
       setLoading(false)
     }
@@ -42,10 +48,16 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
       const res = await fetch(`http://localhost:8080/api/colaborative_process/delete/${selectedId}`, {
         method: "DELETE",
       })
-      if (!res.ok) throw new Error("Error al eliminar proceso")
-      await fetchProcesses()
-    } catch {
-      alert("Error al eliminar el proceso")
+
+      if (res.ok) {
+        toastSuccess("Proceso eliminado correctamente")
+        await fetchProcesses()
+      } else {
+        toastError("Error al eliminar el proceso")
+      }
+    } catch (err) {
+      console.error("Error al eliminar proceso:", err)
+      toastError("No se pudo conectar con el servidor")
     } finally {
       setConfirmOpen(false)
       setSelectedId(null)
@@ -55,19 +67,27 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
   const handleDownload = async (process: Process) => {
     try {
       await generateProcessPDF(process)
-    } catch {
-      alert("Error al generar el PDF")
+      toastInfo("📄 PDF generado correctamente")
+    } catch (err) {
+      console.error("Error al generar PDF:", err)
+      toastError("Error al generar el PDF")
     }
   }
 
   const normalizeText = (t: string) =>
     t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+
   const filtered = processes.filter((p) => {
     const q = normalizeText(searchTerm || "")
-    return normalizeText(p.name_process).includes(q) || normalizeText(p.description_process).includes(q)
+    return (
+      normalizeText(p.name_process).includes(q) ||
+      normalizeText(p.description_process).includes(q)
+    )
   })
 
-  if (loading) return <p className="text-center py-10 text-blue-600 text-lg">Cargando procesos...</p>
+  if (loading)
+    return <p className="text-center py-10 text-blue-600 text-lg">Cargando procesos...</p>
+
   if (error)
     return (
       <div className="text-center py-10 text-red-500 text-lg">
@@ -77,6 +97,7 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
         </button>
       </div>
     )
+
   if (processes.length === 0)
     return <p className="text-center py-10 text-gray-500">No hay procesos registrados.</p>
 
@@ -89,21 +110,38 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
               <div className="catIconCircle">
                 <img src="/caticon.svg" alt="Cat Icon" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">{process.name_process}</h2>
+
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                {process.name_process}
+              </h2>
+
               <p className="text-gray-700 mb-4">{process.description_process}</p>
 
               <div className="processButtonGroup">
                 <Link href={`/procesos/${process.id_process}`}>
-                  <button className="processButton view"><Eye className="h-4 w-4" />Ver</button>
+                  <button className="processButton view">
+                    <Eye className="h-4 w-4" /> Ver
+                  </button>
                 </Link>
+
                 <Link href={`/process/edit/${process.id_process}`}>
-                  <button className="processButton edit"><Edit className="h-4 w-4" />Editar</button>
+                  <button className="processButton edit">
+                    <Edit className="h-4 w-4" /> Editar
+                  </button>
                 </Link>
-                <button className="processButton pdf" onClick={() => handleDownload(process)}>
-                  <Download className="h-4 w-4" />PDF
+
+                <button
+                  className="processButton pdf"
+                  onClick={() => handleDownload(process)}
+                >
+                  <Download className="h-4 w-4" /> PDF
                 </button>
-                <button className="processButton delete" onClick={() => handleDeleteClick(process.id_process)}>
-                  <Trash2 className="h-4 w-4" />Eliminar
+
+                <button
+                  className="processButton delete"
+                  onClick={() => handleDeleteClick(process.id_process)}
+                >
+                  <Trash2 className="h-4 w-4" /> Eliminar
                 </button>
               </div>
             </div>

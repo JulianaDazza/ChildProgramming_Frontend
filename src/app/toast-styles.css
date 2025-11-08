@@ -1,0 +1,45 @@
+/* 🎨 Pastel Theme for Toastify */
+.custom-toast-container {
+  z-index: 9999;
+}
+
+.custom-toast {
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Inter", sans-serif;
+}
+
+/* ✅ Success — verde pastel */
+.Toastify__toast--success {
+  background-color: #d8f3dc !important;
+  color: #1b4332 !important;
+  border-left: 5px solid #40916c !important;
+}
+
+/* ⚠️ Error — rojo pastel */
+.Toastify__toast--error {
+  background-color: #fde2e4 !important;
+  color: #8b1e3f !important;
+  border-left: 5px solid #d90429 !important;
+}
+
+/* ℹ️ Info — azul pastel */
+.Toastify__toast--info {
+  background-color: #caf0f8 !important;
+  color: #023e8a !important;
+  border-left: 5px solid #0077b6 !important;
+}
+
+/* ⚙️ Default — gris suave */
+.Toastify__toast--default {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+  border-left: 5px solid #adb5bd !important;
+}
+
+/*Cuerpo del toast */
+.Toastify__toast-body {
+  font-size: 0.9rem;
+  line-height: 1.3;
+}

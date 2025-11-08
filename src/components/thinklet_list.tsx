@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
+import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
 
 interface Thinklet {
   id_thinklet: number
@@ -18,6 +19,9 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
+  // 👇 Hook para mostrar notificaciones pastel
+  const { toastSuccess, toastError } = useAppToast()
+
   useEffect(() => {
     fetchThinklets()
   }, [])
@@ -29,8 +33,10 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
       const data = await response.json()
       setThinklets(data)
       setError(null)
-    } catch {
+    } catch (err) {
+      console.error("Error al cargar thinklets:", err)
       setError("Error al cargar los thinklets")
+      toastError("Error al cargar los thinklets")
     } finally {
       setLoading(false)
     }
@@ -44,10 +50,19 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
   const confirmDelete = async () => {
     if (!selectedId) return
     try {
-      await fetch(`http://localhost:8080/api/thinklet/delete/${selectedId}`, { method: "DELETE" })
-      await fetchThinklets()
-    } catch {
-      alert("Error al eliminar el thinklet")
+      const res = await fetch(`http://localhost:8080/api/thinklet/delete/${selectedId}`, {
+        method: "DELETE",
+      })
+
+      if (res.ok) {
+        toastSuccess("Thinklet eliminado correctamente")
+        await fetchThinklets()
+      } else {
+        toastError("Error al eliminar el thinklet")
+      }
+    } catch (err) {
+      console.error("Error eliminando thinklet:", err)
+      toastError("No se pudo conectar con el servidor")
     } finally {
       setConfirmOpen(false)
       setSelectedId(null)
@@ -63,7 +78,13 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
       normalize(t.description_thinklet).includes(normalize(searchTerm))
   )
 
-  if (loading) return <p className="text-center py-10 text-blue-600 text-lg">Cargando thinklets...</p>
+  if (loading)
+    return (
+      <p className="text-center py-10 text-blue-600 text-lg">
+        Cargando thinklets...
+      </p>
+    )
+
   if (error)
     return (
       <div className="text-center py-10 text-red-500 text-lg">
@@ -73,8 +94,13 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
         </button>
       </div>
     )
+
   if (thinklets.length === 0)
-    return <p className="text-center py-10 text-gray-500">No existen thinklets todavía.</p>
+    return (
+      <p className="text-center py-10 text-gray-500">
+        No existen thinklets todavía.
+      </p>
+    )
 
   return (
     <>
@@ -85,7 +111,10 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
               <div className="catIconCircle">
                 <img src="/caticon.svg" alt="Cat Icon" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">{thinklet.name_thinklet}</h2>
+
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                {thinklet.name_thinklet}
+              </h2>
               <p className="text-gray-700 mb-4">{thinklet.description_thinklet}</p>
 
               <div className="processButtonGroup">
@@ -94,11 +123,13 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
                     <Eye className="h-4 w-4" /> Ver
                   </button>
                 </Link>
+
                 <Link href={`/thinklets/edit/${thinklet.id_thinklet}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
                   </button>
                 </Link>
+
                 <button
                   className="processButton delete"
                   onClick={() => handleDeleteClick(thinklet.id_thinklet)}

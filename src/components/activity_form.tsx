@@ -2,16 +2,20 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ListTodo, RefreshCcw } from "lucide-react"
 import Link from "next/link"
-import "../app/global.css"
 import { Sidebar } from "./ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast" // 👈 para notificaciones
 
 export function ActivityForm() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
 
-  // ✅ Estructura igual al DTO del backend
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({
+    name_activity: false,
+    id_process: false,
+  })
+
   const [formData, setFormData] = useState({
     name_activity: "",
     description_activity: "",
@@ -21,12 +25,11 @@ export function ActivityForm() {
     id_thinklet: "",
   })
 
-  // Listas de opciones
   const [processes, setProcesses] = useState<any[]>([])
   const [practices, setPractices] = useState<any[]>([])
   const [thinklets, setThinklets] = useState<any[]>([])
 
-  // Cargar datos desde el backend
+  // Cargar datos del backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,14 +43,32 @@ export function ActivityForm() {
         setPractices(await pracRes.json())
         setThinklets(await thinkRes.json())
       } catch (error) {
-        console.error("Error cargando datos:", error)
+        toastError("Error al cargar datos del formulario")
       }
     }
     fetchData()
   }, [])
 
+  const handleChange = (field: string, value: string | boolean) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false })
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // 🧩 Validaciones
+    const newErrors = {
+      name_activity: !formData.name_activity.trim(),
+      id_process: !formData.id_process,
+    }
+
+    if (newErrors.name_activity || newErrors.id_process) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -55,9 +76,7 @@ export function ActivityForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name_activity: formData.name_activity,
-          description_activity: formData.description_activity,
-          iterative: formData.iterative,
+          ...formData,
           id_process: Number(formData.id_process),
           id_practice: formData.id_practice ? Number(formData.id_practice) : null,
           id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
@@ -65,14 +84,14 @@ export function ActivityForm() {
       })
 
       if (response.ok) {
+        toastSuccess("Actividad creada correctamente")
         router.push("/activities/list")
       } else {
         const errorText = await response.text()
-        alert("Error al crear la actividad: " + errorText)
+        toastError(`Error al crear la actividad: ${errorText}`)
       }
-    } catch (error) {
-      console.error("Error creando actividad:", error)
-      alert("No se pudo conectar con el servidor.")
+    } catch {
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -91,14 +110,14 @@ export function ActivityForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre de la actividad: *</label>
             <input
               type="text"
-              required
+              className={`formInput ${errors.name_activity ? "inputError" : ""}`}
               value={formData.name_activity}
-              onChange={(e) => setFormData({ ...formData, name_activity: e.target.value })}
+              onChange={(e) => handleChange("name_activity", e.target.value)}
             />
           </div>
 
@@ -107,30 +126,37 @@ export function ActivityForm() {
             <label>Descripción:</label>
             <input
               type="text"
+              className="formInput"
               value={formData.description_activity}
-              onChange={(e) => setFormData({ ...formData, description_activity: e.target.value })}
+              onChange={(e) => handleChange("description_activity", e.target.value)}
             />
           </div>
 
           {/* Iterativa */}
           <div className="formRow flex items-center">
             <label className="text-gray-800 font-medium mr-3">Iterativa:</label>
-            <input
-              type="checkbox"
-              checked={formData.iterative}
-              onChange={(e) => setFormData({ ...formData, iterative: e.target.checked })}
-              className="w-10 h-10 accent-blue-800 cursor-pointer"
-            />
+
+            <label className="toggleSwitch">
+              <input
+                type="checkbox"
+                checked={formData.iterative}
+                onChange={(e) => handleChange("iterative", e.target.checked)}
+              />
+              <span className="slider">
+                <span className="toggleText">{formData.iterative ? "SI" : "NO"}</span>
+              </span>
+            </label>
           </div>
 
-          {/* Proceso */}
+          {/* Proceso obligatorio */}
           <div className="formRow">
             <label>Proceso:</label>
             <select
+              className={`formInput ${errors.id_process ? "inputError" : ""}`}
               value={formData.id_process}
               onChange={(e) => setFormData({ ...formData, id_process: e.target.value })}
             >
-              <option value="">Selecciona un proceso</option>
+              <option value="">Selecciona una proceso</option>
               {processes.map((pr) => (
                 <option key={pr.id_process} value={pr.id_process}>
                   {pr.name_process}
@@ -143,8 +169,9 @@ export function ActivityForm() {
           <div className="formRow">
             <label>Práctica:</label>
             <select
+              className="formInput"
               value={formData.id_practice}
-              onChange={(e) => setFormData({ ...formData, id_practice: e.target.value })}
+              onChange={(e) => handleChange("id_practice", e.target.value)}
             >
               <option value="">Selecciona una práctica</option>
               {practices.map((pr) => (
@@ -159,8 +186,9 @@ export function ActivityForm() {
           <div className="formRow">
             <label>Thinklet:</label>
             <select
+              className="formInput"
               value={formData.id_thinklet}
-              onChange={(e) => setFormData({ ...formData, id_thinklet: e.target.value })}
+              onChange={(e) => handleChange("id_thinklet", e.target.value)}
             >
               <option value="">Selecciona un thinklet</option>
               {thinklets.map((th) => (

@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { PracticeList } from "@/components/practices_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -11,11 +10,10 @@ export default function PracticesListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-
-      <main className="processMain">
-        {/* 🔹 Encabezado con ícono + título */}
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado */}
         <div className="processHeader">
           <div className="processTitleRow">
             <div className="catIconCircle small">
@@ -29,6 +27,7 @@ export default function PracticesListPage() {
           </p>
         </div>
 
+        {/* Barra de búsqueda y botón */}
         <div className="actionBar">
           <div className="searchContainer">
             <Search className="searchIcon" />
@@ -47,8 +46,9 @@ export default function PracticesListPage() {
           </Link>
         </div>
 
+        {/* Lista de prácticas */}
         <PracticeList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

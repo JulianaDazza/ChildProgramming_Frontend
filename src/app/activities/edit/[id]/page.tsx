@@ -6,10 +6,12 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export default function ActivityEditPage() {
   const router = useRouter()
   const { id } = useParams()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -21,11 +23,16 @@ export default function ActivityEditPage() {
     id_thinklet: "",
   })
 
+  const [errors, setErrors] = useState({
+    name_activity: false,
+    id_process: false,
+  })
+
   const [processes, setProcesses] = useState<any[]>([])
   const [practices, setPractices] = useState<any[]>([])
   const [thinklets, setThinklets] = useState<any[]>([])
 
-  // 🧩 Cargar datos
+  // 🧩 Cargar datos iniciales
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -39,29 +46,50 @@ export default function ActivityEditPage() {
         setPractices(await pracRes.json())
         setThinklets(await thinkRes.json())
 
-        // ✅ Cargar la actividad específica
+        // ✅ Cargar actividad específica
         const actRes = await fetch(`http://localhost:8080/api/child_activity/${id}`)
         if (!actRes.ok) throw new Error("Error al obtener la actividad")
         const data = await actRes.json()
+
         setFormData({
-          name_activity: data.name_activity,
-          description_activity: data.description_activity,
-          iterative: data.iterative,
+          name_activity: data.name_activity || "",
+          description_activity: data.description_activity || "",
+          iterative: data.iterative || false,
           id_process: data.id_process ? data.id_process.toString() : "",
           id_practice: data.id_practice ? data.id_practice.toString() : "",
           id_thinklet: data.id_thinklet ? data.id_thinklet.toString() : "",
         })
       } catch (error) {
         console.error("Error cargando datos:", error)
-        alert("No se pudo cargar la información de la actividad.")
+        toastError("No se pudo cargar la información de la actividad.")
       }
     }
+
     if (id) fetchAll()
   }, [id])
 
-  // 🧩 Enviar actualización
+  // 🧩 Manejar cambios en los campos
+  const handleChange = (field: string, value: string | boolean) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false }) // limpia el error visual
+  }
+
+  // 🧩 Guardar cambios
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // Validar campos requeridos
+    const newErrors = {
+      name_activity: !formData.name_activity.trim(),
+      id_process: !formData.id_process,
+    }
+
+    if (newErrors.name_activity || newErrors.id_process) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
     try {
       const response = await fetch(`http://localhost:8080/api/child_activity/update/${id}`, {
@@ -78,15 +106,15 @@ export default function ActivityEditPage() {
       })
 
       if (response.ok) {
-        alert("Actividad actualizada correctamente.")
+        toastSuccess("Actividad actualizada correctamente")
         router.push("/activities/list")
       } else {
         const errorText = await response.text()
-        alert("Error al actualizar la actividad: " + errorText)
+        toastError(`Error al actualizar la actividad: ${errorText}`)
       }
     } catch (error) {
       console.error("Error actualizando actividad:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -106,48 +134,57 @@ export default function ActivityEditPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm space-y-5">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre de la actividad: *</label>
             <input
               type="text"
-              required
               value={formData.name_activity}
-              onChange={(e) => setFormData({ ...formData, name_activity: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("name_activity", e.target.value)}
+              className={`formInput ${errors.name_activity ? "inputError" : ""}`}
             />
           </div>
 
-          {/* Descripción */}
+          {/* Descripción opcional */}
           <div className="formRow">
             <label>Descripción:</label>
             <input
               type="text"
               value={formData.description_activity}
-              onChange={(e) => setFormData({ ...formData, description_activity: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("description_activity", e.target.value)}
+              className="formInput"
             />
           </div>
 
           {/* Iterativa */}
           <div className="formRow flex items-center">
             <label className="text-gray-800 font-medium mr-3">Iterativa:</label>
-            <input
-            type="checkbox"
-            checked={formData.iterative}
-            disabled
-            readOnly
-            className="w-6 h-6 accent-blue-600 cursor-default"
-            />
+
+            <label className="toggleSwitch">
+              <input
+                type="checkbox"
+                checked={formData.iterative}
+                disabled
+                readOnly
+                onChange={(e) =>
+                  setFormData({ ...formData, iterative: e.target.checked })
+                }
+              />
+              <span className="slider">
+                <span className="toggleText">
+                  {formData.iterative ? "YES" : "NO"}
+                </span>
+              </span>
+            </label>
           </div>
 
-          {/* Proceso */}
+          {/* Proceso obligatorio */}
           <div className="formRow">
-            <label>Proceso:</label>
+            <label>Proceso: *</label>
             <select
               value={formData.id_process}
-              onChange={(e) => setFormData({ ...formData, id_process: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("id_process", e.target.value)}
+              className={`formInput ${errors.id_process ? "inputError" : ""}`}
             >
               <option value="">Selecciona un proceso</option>
               {processes.map((p) => (
@@ -163,8 +200,8 @@ export default function ActivityEditPage() {
             <label>Práctica:</label>
             <select
               value={formData.id_practice}
-              onChange={(e) => setFormData({ ...formData, id_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("id_practice", e.target.value)}
+              className="formInput"
             >
               <option value="">Selecciona una práctica</option>
               {practices.map((pr) => (
@@ -180,8 +217,8 @@ export default function ActivityEditPage() {
             <label>Thinklet:</label>
             <select
               value={formData.id_thinklet}
-              onChange={(e) => setFormData({ ...formData, id_thinklet: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("id_thinklet", e.target.value)}
+              className="formInput"
             >
               <option value="">Selecciona un thinklet</option>
               {thinklets.map((th) => (

@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Eye, Edit, Trash2, ListTodo } from "lucide-react"
+import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
-import { ConfirmModal } from "../ui/confirmModal"// Asegúrate que el archivo se llame igual (mayúscula C)
+import { ConfirmModal } from "../ui/confirmModal"
+import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
 
 interface Activity {
   id_activity: number
@@ -19,10 +20,11 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Estado para el modal de confirmación
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+
+  // 👇 Hook de notificaciones
+  const { toastSuccess, toastError } = useAppToast()
 
   useEffect(() => {
     fetchActivities()
@@ -38,29 +40,33 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
     } catch (err) {
       console.error("Error al obtener actividades:", err)
       setError("Error al cargar las actividades")
+      toastError("Error al cargar las actividades")
     } finally {
       setLoading(false)
     }
   }
 
-  // Abre el modal
   const handleDeleteClick = (id: number) => {
     setSelectedId(id)
     setConfirmOpen(true)
   }
 
-  // Confirma la eliminación
   const confirmDelete = async () => {
     if (!selectedId) return
     try {
       const res = await fetch(`http://localhost:8080/api/child_activity/delete/${selectedId}`, {
         method: "DELETE",
       })
-      if (!res.ok) throw new Error("Error al eliminar")
-      await fetchActivities()
+
+      if (res.ok) {
+        toastSuccess("Actividad eliminada correctamente")
+        await fetchActivities()
+      } else {
+        toastError("Error al eliminar la actividad")
+      }
     } catch (error) {
       console.error("Error eliminando actividad:", error)
-      alert("Error al eliminar la actividad")
+      toastError("No se pudo conectar con el servidor")
     } finally {
       setConfirmOpen(false)
       setSelectedId(null)
@@ -79,7 +85,11 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
   })
 
   if (loading)
-    return <div className="text-center py-10 text-blue-600 text-lg">Cargando actividades...</div>
+    return (
+      <div className="text-center py-10 text-blue-600 text-lg">
+        Cargando actividades...
+      </div>
+    )
 
   if (error)
     return (
@@ -92,7 +102,11 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
     )
 
   if (activities.length === 0)
-    return <div className="text-center py-10 text-gray-500">No hay actividades registradas.</div>
+    return (
+      <div className="text-center py-10 text-gray-500">
+        No hay actividades registradas.
+      </div>
+    )
 
   return (
     <>
@@ -143,7 +157,6 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
         ))}
       </div>
 
-      {/* Modal de confirmación estilizado */}
       {confirmOpen && (
         <ConfirmModal
           title="Eliminar actividad"

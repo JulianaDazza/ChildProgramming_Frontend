@@ -6,16 +6,23 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export default function PracticeEditPage() {
   const router = useRouter()
   const { id } = useParams()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     name_practice: "",
     description_practice: "",
     type_practice: "",
+  })
+
+  const [errors, setErrors] = useState({
+    name_practice: false,
+    type_practice: false,
   })
 
   // Enum del backend (tipos de práctica)
@@ -30,22 +37,40 @@ export default function PracticeEditPage() {
 
         const data = await res.json()
         setFormData({
-          name_practice: data.name_practice,
+          name_practice: data.name_practice || "",
           description_practice: data.description_practice || "",
           type_practice: data.type_practice || "",
         })
       } catch (error) {
         console.error("Error cargando práctica:", error)
-        alert("No se pudo cargar la información de la práctica.")
+        toastError("No se pudo cargar la información de la práctica.")
       }
     }
 
     if (id) fetchPractice()
   }, [id])
 
-  // 🧩 Actualizar práctica
+  // 🧩 Manejo de cambios
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false })
+  }
+
+  // 🧩 Guardar cambios
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const newErrors = {
+      name_practice: !formData.name_practice.trim(),
+      type_practice: !formData.type_practice.trim(),
+    }
+
+    if (newErrors.name_practice || newErrors.type_practice) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -56,15 +81,15 @@ export default function PracticeEditPage() {
       })
 
       if (res.ok) {
-        alert("Práctica actualizada correctamente.")
+        toastSuccess("Práctica actualizada correctamente")
         router.push("/practices/list")
       } else {
         const errorText = await res.text()
-        alert("Error al actualizar la práctica: " + errorText)
+        toastError(`Error al actualizar la práctica: ${errorText}`)
       }
     } catch (error) {
       console.error("Error actualizando práctica:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -84,40 +109,35 @@ export default function PracticeEditPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm space-y-5">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre de la práctica: *</label>
             <input
               type="text"
-              required
               value={formData.name_practice}
-              onChange={(e) => setFormData({ ...formData, name_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("name_practice", e.target.value)}
+              className={`formInput ${errors.name_practice ? "inputError" : ""}`}
             />
           </div>
 
-          {/* Descripción */}
+          {/* Descripción opcional */}
           <div className="formRow">
             <label>Descripción:</label>
             <input
               type="text"
               value={formData.description_practice}
-              onChange={(e) => setFormData({ ...formData, description_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("description_practice", e.target.value)}
+              className="formInput"
             />
           </div>
 
-          {/* Tipo */}
+          {/* Tipo obligatorio */}
           <div className="formRow">
-            <label>Tipo de práctica:</label>
+            <label>Tipo de práctica: *</label>
             <select
-              required
               value={formData.type_practice}
-              onChange={(e) => setFormData({ ...formData, type_practice: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("type_practice", e.target.value)}
+              className={`formInput ${errors.type_practice ? "inputError" : ""}`}
             >
               <option value="">Selecciona un tipo</option>
               {practiceTypes.map((type) => (
@@ -131,21 +151,12 @@ export default function PracticeEditPage() {
           {/* Botones */}
           <div className="buttonGroup flex justify-between mt-6">
             <Link href="/practices/list">
-              <button
-                type="button"
-                className="btnVolver border-2 border-blue-600 text-blue-600 font-semibold 
-                  px-6 py-2 rounded-2xl hover:bg-blue-50 transition"
-              >
+              <button type="button" className="btnVolver">
                 Cancelar
               </button>
             </Link>
 
-            <button
-              type="submit"
-              className="btnCrear bg-blue-600 text-white font-semibold px-6 py-2 rounded-2xl 
-                hover:bg-blue-700 transition"
-              disabled={loading}
-            >
+            <button type="submit" className="btnCrear" disabled={loading}>
               {loading ? "Guardando..." : "Guardar Cambios"}
             </button>
           </div>

@@ -6,15 +6,21 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export default function PatternEditPage() {
   const router = useRouter()
   const { id } = useParams()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     name_pattern: "",
     description_pattern: "",
+  })
+
+  const [errors, setErrors] = useState({
+    name_pattern: false,
   })
 
   // 🧩 Cargar patrón por ID
@@ -26,21 +32,38 @@ export default function PatternEditPage() {
 
         const data = await res.json()
         setFormData({
-          name_pattern: data.name_pattern,
+          name_pattern: data.name_pattern || "",
           description_pattern: data.description_pattern || "",
         })
       } catch (error) {
         console.error("Error cargando patrón:", error)
-        alert("No se pudo cargar la información del patrón colaborativo.")
+        toastError("No se pudo cargar la información del patrón colaborativo.")
       }
     }
 
     if (id) fetchPattern()
   }, [id])
 
+  // 🧩 Manejo de cambios
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false }) // limpia error al escribir
+  }
+
   // 🧩 Actualizar patrón
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const newErrors = {
+      name_pattern: !formData.name_pattern.trim(),
+    }
+
+    if (newErrors.name_pattern) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -51,15 +74,15 @@ export default function PatternEditPage() {
       })
 
       if (res.ok) {
-        alert("Patrón actualizado correctamente.")
+        toastSuccess("Patrón actualizado correctamente")
         router.push("/patterns/list")
       } else {
         const errorText = await res.text()
-        alert("Error al actualizar el patrón: " + errorText)
+        toastError(`Error al actualizar el patrón: ${errorText}`)
       }
     } catch (error) {
       console.error("Error actualizando patrón:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -79,28 +102,25 @@ export default function PatternEditPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm space-y-5">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre del patrón: *</label>
             <input
               type="text"
-              required
               value={formData.name_pattern}
-              onChange={(e) => setFormData({ ...formData, name_pattern: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("name_pattern", e.target.value)}
+              className={`formInput ${errors.name_pattern ? "inputError" : ""}`}
             />
           </div>
 
           {/* Descripción */}
           <div className="formRow">
             <label>Descripción:</label>
-            <input
-              type="text"
+            <textarea
+              rows={4}
               value={formData.description_pattern}
-              onChange={(e) => setFormData({ ...formData, description_pattern: e.target.value })}
-              className="w-full border-2 border-blue-600 rounded-2xl px-3 py-2 text-gray-800 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              onChange={(e) => handleChange("description_pattern", e.target.value)}
+              className="formInput"
             />
           </div>
 
