@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { RoundList } from "@/components/round_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -11,14 +10,24 @@ export default function RoundsListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-      <main className="processMain">
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado */}
         <div className="processHeader">
-          <h1 className="heroTitle">Rondas</h1>
-          <p>Consulta, busca o crea nuevas rondas colaborativas.</p>
+          <div className="processTitleRow">
+            <div className="catIconCircle small">
+              <img src="/roundicon.svg" alt="Icono de rondas" />
+            </div>
+            <h1 className="heroTitle m-0">Rondas</h1>
+          </div>
+
+          <p className="text-gray-600">
+            Consulta, busca o crea nuevas rondas colaborativas.
+          </p>
         </div>
 
+        {/* Barra de búsqueda y botón */}
         <div className="actionBar">
           <div className="searchContainer">
             <Search className="searchIcon" />
@@ -37,8 +46,9 @@ export default function RoundsListPage() {
           </Link>
         </div>
 
+        {/* Lista de rondas */}
         <RoundList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

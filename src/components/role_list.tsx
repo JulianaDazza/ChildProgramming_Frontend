@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
+import { useAppToast } from "@/hooks/useAppToast"
 
 interface Role {
   id_role: number
@@ -17,6 +18,9 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+
+  // 👇 usamos el hook personalizado
+  const { toastSuccess, toastError, toastInfo } = useAppToast()
 
   useEffect(() => {
     fetchRoles()
@@ -32,6 +36,7 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
     } catch (error) {
       console.error("Error fetching roles:", error)
       setError("Error al cargar los roles")
+      toastError("No se pudieron cargar los roles")
     } finally {
       setLoading(false)
     }
@@ -45,12 +50,19 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
   const confirmDelete = async () => {
     if (!selectedId) return
     try {
-      await fetch(`http://localhost:8080/api/role/delete/${selectedId}`, {
+      const response = await fetch(`http://localhost:8080/api/role/delete/${selectedId}`, {
         method: "DELETE",
       })
-      fetchRoles()
-    } catch {
-      alert("Error al eliminar el rol")
+
+      if (response.ok) {
+        toastSuccess("Rol eliminado correctamente")
+        fetchRoles()
+      } else {
+        toastError("Error al eliminar el rol")
+      }
+    } catch (error) {
+      console.error(error)
+      toastError("No se pudo conectar con el servidor")
     } finally {
       setConfirmOpen(false)
       setSelectedId(null)
@@ -84,16 +96,13 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
   if (roles.length === 0)
     return <div className="text-center py-10 text-gray-500">No existen roles todavía.</div>
 
-  // ✅ CORRECTO: fragmento <></> envolviendo todo
   return (
     <>
       <div className="grid gap-6 mt-6">
         {filtered.map((role) => (
           <div key={role.id_role} className="processCardContainer">
             <div className="flex flex-col items-center justify-center p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                {role.name_role}
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">{role.name_role}</h2>
               <p className="text-gray-600 mb-3">{role.description_role}</p>
 
               <div className="processButtonGroup">

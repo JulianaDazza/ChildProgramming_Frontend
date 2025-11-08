@@ -6,19 +6,45 @@ import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../app/global.css"
 import { Sidebar } from "./ui/sidebar"
+import { useAppToast } from "@/hooks/useAppToast"
 
 export function CollaborativePatternForm() {
   const router = useRouter()
+  const { toastSuccess, toastError, toastWarning } = useAppToast()
   const [loading, setLoading] = useState(false)
 
-  // ✅ Campos iguales al DTO del backend
+  // Datos del formulario
   const [formData, setFormData] = useState({
     name_pattern: "",
     description_pattern: "",
   })
 
+  // Estado de errores
+  const [errors, setErrors] = useState({
+    name_pattern: false,
+  })
+
+  // 🔹 Manejador de cambios
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value })
+    setErrors({ ...errors, [field]: false })
+  }
+
+  // 🔹 Enviar formulario
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    // Validación manual
+    const newErrors = {
+      name_pattern: !formData.name_pattern.trim(),
+    }
+
+    if (newErrors.name_pattern) {
+      setErrors(newErrors)
+      toastWarning("Completa los campos obligatorios antes de continuar")
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -29,14 +55,15 @@ export function CollaborativePatternForm() {
       })
 
       if (response.ok) {
-        router.push("/patterns/list") // redirige al listado de patrones
+        toastSuccess("Patrón creado correctamente")
+        router.push("/patterns/list")
       } else {
         const errorText = await response.text()
-        alert("Error al crear el patrón: " + errorText)
+        toastError(`Error al crear el patrón: ${errorText}`)
       }
     } catch (error) {
       console.error("Error creando patrón:", error)
-      alert("No se pudo conectar con el servidor.")
+      toastError("No se pudo conectar con el servidor.")
     } finally {
       setLoading(false)
     }
@@ -56,34 +83,36 @@ export function CollaborativePatternForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="processForm">
-          {/* Nombre */}
+          {/* Nombre obligatorio */}
           <div className="formRow">
             <label>Nombre del patrón: *</label>
             <input
               type="text"
-              required
               value={formData.name_pattern}
-              onChange={(e) => setFormData({ ...formData, name_pattern: e.target.value })}
+              onChange={(e) => handleChange("name_pattern", e.target.value)}
+              className={`formInput ${errors.name_pattern ? "inputError" : ""}`}
             />
           </div>
 
-          {/* Descripción */}
+          {/* Descripción opcional */}
           <div className="formRow">
             <label>Descripción:</label>
             <textarea
               rows={4}
               value={formData.description_pattern}
-              onChange={(e) => setFormData({ ...formData, description_pattern: e.target.value })}
+              onChange={(e) => handleChange("description_pattern", e.target.value)}
+              className="formInput"
             />
           </div>
 
           {/* Botones */}
-          <div className="buttonGroup">
-            <Link href="/patterns">
+          <div className="buttonGroup flex justify-between mt-6">
+            <Link href="/patterns/list">
               <button type="button" className="btnVolver">
                 Volver
               </button>
             </Link>
+
             <button type="submit" className="btnCrear" disabled={loading}>
               {loading ? "Creando..." : "Crear Patrón"}
             </button>

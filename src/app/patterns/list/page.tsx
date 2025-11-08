@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { PatternList } from "@/components/pattern_list"
 import { Plus, Search, Shapes } from "lucide-react"
 import Link from "next/link"
@@ -11,19 +10,23 @@ export default function PatternsListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-      <main className="processMain">
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado con ícono */}
         <div className="processHeader">
           <div className="processTitleRow">
             <div className="catIconCircle small">
-              <Shapes className="w-5 h-5" stroke="white" strokeWidth={2} /> 
+              <Shapes className="w-5 h-5" stroke="white" strokeWidth={2} />
             </div>
-            <h1 className="heroTitle m-0">Thinklets</h1>
+            <h1 className="heroTitle m-0">Patrones</h1>
           </div>
-          <p>Consulta, busca o crea nuevos patrones colaborativos.</p>
+          <p className="text-gray-600">
+            Consulta, busca o crea nuevos patrones colaborativos.
+          </p>
         </div>
 
+        {/* Barra de búsqueda y botón */}
         <div className="actionBar">
           <div className="searchContainer">
             <Search className="searchIcon" />
@@ -42,8 +45,9 @@ export default function PatternsListPage() {
           </Link>
         </div>
 
+        {/* Lista de patrones */}
         <PatternList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

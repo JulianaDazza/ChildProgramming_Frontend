@@ -1,20 +1,19 @@
 "use client"
 
-import { Sidebar } from "@/components/ui/sidebar"
 import { ActivityList } from "@/components/activity/activity_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import "../../global.css" 
+import "../../global.css"
 
 export default function ActivitiesListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-
-      <main className="processMain">
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado */}
         <div className="processHeader">
           <div className="processTitleRow">
             <div className="catIconCircle small">
@@ -22,12 +21,13 @@ export default function ActivitiesListPage() {
             </div>
             <h1 className="heroTitle m-0">Actividades</h1>
           </div>
+
           <p className="text-gray-600">
             Consulta, busca o crea nuevas actividades colaborativas.
           </p>
         </div>
 
-
+        {/* Barra de búsqueda y botón */}
         <div className="actionBar">
           <div className="searchContainer">
             <Search className="searchIcon" />
@@ -46,8 +46,9 @@ export default function ActivitiesListPage() {
           </Link>
         </div>
 
+        {/* Lista */}
         <ActivityList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

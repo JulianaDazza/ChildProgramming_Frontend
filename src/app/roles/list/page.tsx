@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { RoleList } from "@/components/role_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -11,12 +10,11 @@ export default function RolesListPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   return (
-    <div className="processContainer">
-      <Sidebar />
-
-      <main className="processMain">
+    <main className="layoutMain">
+      {/* 🔹 Panel blanco envolvente */}
+      <div className="contentWrapper">
+        {/* Encabezado */}
         <div className="processHeader">
-          {/* 🔹 Encabezado con ícono + título */}
           <div className="processTitleRow">
             <div className="catIconCircle small">
               <img src="/iconteam.svg" alt="Icono de roles" />
@@ -29,6 +27,7 @@ export default function RolesListPage() {
           </p>
         </div>
 
+        {/* Barra de búsqueda y botón */}
         <div className="actionBar">
           <div className="searchContainer">
             <Search className="searchIcon" />
@@ -47,8 +46,9 @@ export default function RolesListPage() {
           </Link>
         </div>
 
+        {/* Lista de roles */}
         <RoleList searchTerm={searchTerm} />
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }
