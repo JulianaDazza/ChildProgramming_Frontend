@@ -15,6 +15,7 @@ export type Thinklet = {
   id_thinklet: number;
   name_thinklet: string;
   description_thinklet: string;
+  pattern?: CollaborativePattern | null 
 };
 
 export type CollaborativePattern = {

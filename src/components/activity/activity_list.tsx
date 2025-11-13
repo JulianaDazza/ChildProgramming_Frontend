@@ -5,6 +5,8 @@ import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "../ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
+import Loading from "@/app/loading"
+
 
 interface Activity {
   id_activity: number
@@ -85,11 +87,7 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
   })
 
   if (loading)
-    return (
-      <div className="text-center py-10 text-blue-600 text-lg">
-        Cargando actividades...
-      </div>
-    )
+    return <Loading/>
 
   if (error)
     return (

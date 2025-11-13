@@ -5,6 +5,7 @@ import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
+import Loading from "@/app/loading"
 
 interface Practice {
   id_practice: number
@@ -80,9 +81,7 @@ export function PracticeList({ searchTerm }: { searchTerm?: string }) {
   )
 
   if (loading)
-    return (
-      <p className="text-center py-10 text-blue-600 text-lg">Cargando prácticas...</p>
-    )
+      return <Loading/>
 
   if (error)
     return (
@@ -109,13 +108,9 @@ export function PracticeList({ searchTerm }: { searchTerm?: string }) {
             <div className="flex flex-col items-center p-6">
               <h2 className="text-lg font-semibold">{practice.name_practice}</h2>
               <p className="text-gray-600 mb-4">{practice.description_practice}</p>
+              <p className="text-gray-600 mb-4">{practice.type_practice}</p>
 
               <div className="processButtonGroup">
-                <Link href={`/practices/${practice.id_practice}`}>
-                  <button className="processButton view">
-                    <Eye className="h-4 w-4" /> Ver
-                  </button>
-                </Link>
 
                 <Link href={`/practices/edit/${practice.id_practice}`}>
                   <button className="processButton edit">

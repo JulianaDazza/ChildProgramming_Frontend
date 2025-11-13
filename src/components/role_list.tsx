@@ -5,11 +5,13 @@ import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast"
+import Loading from "@/app/loading"
 
 interface Role {
   id_role: number
   name_role: string
   description_role: string
+  skills_role: string
 }
 
 export function RoleList({ searchTerm }: { searchTerm?: string }) {
@@ -81,7 +83,7 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
   })
 
   if (loading)
-    return <div className="text-center py-10 text-blue-600 text-lg">Cargando roles...</div>
+      return <Loading/>
 
   if (error)
     return (
@@ -104,13 +106,9 @@ export function RoleList({ searchTerm }: { searchTerm?: string }) {
             <div className="flex flex-col items-center justify-center p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-2">{role.name_role}</h2>
               <p className="text-gray-600 mb-3">{role.description_role}</p>
+              <p className="text-gray-600 mb-3">{role.skills_role}</p>
 
               <div className="processButtonGroup">
-                <Link href={`/roles/${role.id_role}`}>
-                  <button className="processButton view">
-                    <Eye className="h-4 w-4" /> Ver
-                  </button>
-                </Link>
 
                 <Link href={`/roles/edit/${role.id_role}`}>
                   <button className="processButton edit">

@@ -425,11 +425,10 @@
 }
 
 .processContainer {
-  /*display: flex;*/
+  display: flex;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
-
 
 
 .collapseButton {
@@ -497,10 +496,14 @@
 .processMain {
   flex: 1;
   background-color: white;
-  padding: 2rem 4rem;
+  padding: 2rem 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: all 0.3s ease;
+
+  margin-left: 260px; /* espacio cuando sidebar está abierto */
+  max-width: calc(100% - 280px);
 }
 
 .logoBox {
@@ -1064,7 +1067,8 @@ select.formInput {
 }
 
 .sidebar.collapsed ~ .processMain {
-  margin-left: 80px;
+  margin-left: 90px;
+  max-width: calc(100% - 110px);
 }
 
 /* === LAYOUT GLOBAL === */
@@ -1101,3 +1105,160 @@ select.formInput {
 .sidebar.collapsed ~ .layoutMain {
   margin-left: 80px;
 }
+
+
+/* 🔹 Unificación de tipografía global */
+html, body, main, .layoutMain, .processContainer, .contentWrapper {
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+
+/* Cuando el sidebar está expandido */
+.processContainer .processMain {
+  margin-left: 240px !important;
+  transition: margin-left 0.3s ease;
+}
+
+
+/* === Spinner de carga reutilizable === */
+.loadingSpinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #93c5fd; /* azul claro */
+  border-top: 3px solid #2563eb; /* azul principal */
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+/* Animación del giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* === Pantalla de carga centrada === */
+.loadingScreen {
+  display: flex;
+  flex-direction: row; /* spinner + texto en una línea */
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* ocupa toda la altura visible */
+  width: 100%;
+  gap: 0.75rem;
+  background-color: white; /* opcional, para un fondo limpio */
+}
+
+
+/* === Estilo para página de detalle de proceso === */
+
+.detailCard {
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  margin-top: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detailCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.processDetailContent {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Tarjeta de información */
+.processInfoCard {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 700px;
+  text-align: left;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.05);
+}
+
+.processInfoCard h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.processInfoCard p {
+  color: #374151;
+  line-height: 1.6;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Botones */
+.processButtonRow {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btnBack,
+.btnDownload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* Volver */
+.btnBack {
+  background-color: white;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+.btnBack:hover {
+  background-color: #eff6ff;
+}
+
+/* Descargar PDF */
+.btnDownload {
+  background-color: #2563eb;
+  border: 2px solid #2563eb;
+  color: white;
+}
+
+.btnDownload:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .processInfoCard {
+    text-align: center;
+    padding: 1.25rem;
+  }
+  .processButtonRow {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btnBack,
+  .btnDownload {
+    width: 100%;
+  }
+}
+
+

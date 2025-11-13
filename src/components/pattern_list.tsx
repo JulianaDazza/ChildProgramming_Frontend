@@ -5,6 +5,7 @@ import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast" // 👈 importamos el hook
+import Loading from "@/app/loading"
 
 interface Pattern {
   id_pattern: number
@@ -78,7 +79,7 @@ export function PatternList({ searchTerm }: { searchTerm?: string }) {
   )
 
   if (loading)
-    return <p className="text-center py-10 text-blue-600">Cargando patrones...</p>
+      return <Loading/>
 
   if (error)
     return (
@@ -103,12 +104,7 @@ export function PatternList({ searchTerm }: { searchTerm?: string }) {
               <p className="text-gray-600 mb-4">{pattern.description_pattern}</p>
 
               <div className="processButtonGroup">
-                <Link href={`/patterns/${pattern.id_pattern}`}>
-                  <button className="processButton view">
-                    <Eye className="h-4 w-4" /> Ver
-                  </button>
-                </Link>
-
+                
                 <Link href={`/patterns/edit/${pattern.id_pattern}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar

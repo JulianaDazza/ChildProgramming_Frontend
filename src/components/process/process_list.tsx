@@ -8,6 +8,7 @@ import { generateProcessPDF } from "../../lib/pdf_generator"
 import type { Process } from "../../lib/types"
 import { ConfirmModal } from "../ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast" // 👈 importamos el hook
+import Loading from "@/app/loading"
 
 export function Process_list({ searchTerm }: { searchTerm?: string }) {
   const [processes, setProcesses] = useState<Process[]>([])
@@ -86,7 +87,7 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
   })
 
   if (loading)
-    return <p className="text-center py-10 text-blue-600 text-lg">Cargando procesos...</p>
+      return <Loading/>
 
   if (error)
     return (
@@ -118,13 +119,13 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
               <p className="text-gray-700 mb-4">{process.description_process}</p>
 
               <div className="processButtonGroup">
-                <Link href={`/procesos/${process.id_process}`}>
+                <Link href={`/process/${process.id_process}`}>
                   <button className="processButton view">
                     <Eye className="h-4 w-4" /> Ver
                   </button>
                 </Link>
 
-                <Link href={`/process/edit/${process.id_process}`}>
+                <Link href={`/procesos/${process.id_process}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
                   </button>

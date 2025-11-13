@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
+import Loading from "@/app/loading"
 
 interface Round {
   id_round: number
@@ -56,7 +57,8 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
       normalize(r.description_round).includes(normalize(searchTerm))
   )
 
-  if (loading) return <p className="text-center py-10 text-blue-600">Cargando rondas...</p>
+  if (loading)
+      return <Loading/>
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>
   if (rounds.length === 0)
     return <p className="text-center py-10 text-gray-500">No existen rondas todavía.</p>
@@ -69,12 +71,9 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
             <div className="flex flex-col items-center p-6">
               <h2 className="text-lg font-semibold">{round.name_round}</h2>
               <p className="text-gray-600 mb-4">{round.description_round}</p>
+
               <div className="processButtonGroup">
-                <Link href={`/rounds/${round.id_round}`}>
-                  <button className="processButton view">
-                    <Eye className="h-4 w-4" /> Ver
-                  </button>
-                </Link>
+              
                 <Link href={`/rounds/${round.id_round}/edit`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
