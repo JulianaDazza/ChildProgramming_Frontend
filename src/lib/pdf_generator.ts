@@ -1,5 +1,42 @@
+import jsPDF from "jspdf"
+import html2canvas from "html2canvas"
+
+export async function generateProcessPDF(element: HTMLDivElement, fileName: string) {
+
+  // Capturar el elemento como imagen
+  const canvas = await html2canvas(element, {
+    scale: 2,    // Mejor resolución
+    useCORS: true
+  })
+
+  const imgData = canvas.toDataURL("image/png")
+  const pdf = new jsPDF("p", "mm", "a4")
+
+  const pdfWidth = pdf.internal.pageSize.getWidth()
+  const pdfHeight = pdf.internal.pageSize.getHeight()
+
+  // Calcular tamaño proporcional
+  const imgWidth = pdfWidth
+  const imgHeight = (canvas.height * pdfWidth) / canvas.width
+
+  let heightLeft = imgHeight
+  let position = 0
+
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
+  heightLeft -= pdfHeight
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight
+    pdf.addPage()
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
+    heightLeft -= pdfHeight
+  }
+
+  pdf.save(`${fileName}.pdf`)
+}
+
 // src/lib/pdf-generator.ts
-import jsPDF from "jspdf";
+/*import jsPDF from "jspdf";
 import type { Process } from "./types";
 
 // Colores definidos como tuplas (3 valores exactos)
@@ -30,13 +67,13 @@ export async function generateProcessPDF(process: Process) {
   doc.setTextColor(60, 60, 60);
   doc.text(process.id_process.toString(), 20, 90);
 
-  // ====== OBJETIVO EN RECUADRO ======
+  // ====== DESCRIPCION EN RECUADRO ======
   const goalText = process.description_process ?? "Descripcion";
   const splitGoal = doc.splitTextToSize(goalText, 160);
 
   doc.setFontSize(18);
   doc.setTextColor(0, 0, 0);
-  doc.text("Objetivo:", 20, 110);
+  doc.text("Descripcion:", 20, 110);
 
   // Dibuja un recuadro azul claro detrás del objetivo
   const boxX = 20;
@@ -66,4 +103,4 @@ export async function generateProcessPDF(process: Process) {
   doc.save(
     `proceso-${process.id_process}-${process.name_process.replace(/\s+/g, "-").toLowerCase()}.pdf`
   );
-}
+}*/
