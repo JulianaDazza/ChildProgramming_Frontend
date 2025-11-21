@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Sidebar } from "./ui/sidebar"
-import { useAppToast } from "@/hooks/useAppToast" // 👈 para notificaciones
+import { useAppToast } from "@/hooks/useAppToast" 
+import Loading from "@/app/loading"
 
 export function ActivityForm() {
   const router = useRouter()
