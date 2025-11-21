@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Sidebar } from "./ui/sidebar"
 import { useAppToast } from "@/hooks/useAppToast" 
@@ -29,6 +29,17 @@ export function ActivityForm() {
   const [processes, setProcesses] = useState<any[]>([])
   const [practices, setPractices] = useState<any[]>([])
   const [thinklets, setThinklets] = useState<any[]>([])
+
+  ////////////////////////////////////////////////
+  const params = useSearchParams()
+  const id_process_param = params.get("id_process")
+
+  useEffect(() => {
+    if (id_process_param) {
+      setFormData((prev) => ({ ...prev, id_process: id_process_param }))
+    }
+  }, [id_process_param])
+  ////////////////////////////////////////////////
 
   // Cargar datos del backend
   useEffect(() => {

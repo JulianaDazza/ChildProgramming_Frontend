@@ -65,16 +65,6 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
     }
   }
 
-  const handleDownload = async (process: Process) => {
-    try {
-      await generateProcessPDF(process)
-      toastInfo("📄 PDF generado correctamente")
-    } catch (err) {
-      console.error("Error al generar PDF:", err)
-      toastError("Error al generar el PDF")
-    }
-  }
-
   const normalizeText = (t: string) =>
     t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
@@ -125,19 +115,12 @@ export function Process_list({ searchTerm }: { searchTerm?: string }) {
                   </button>
                 </Link>
 
-                <Link href={`/procesos/${process.id_process}`}>
+                <Link href={`/process/edit/${process.id_process}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
                   </button>
                 </Link>
-
-                <button
-                  className="processButton pdf"
-                  onClick={() => handleDownload(process)}
-                >
-                  <Download className="h-4 w-4" /> PDF
-                </button>
-
+                
                 <button
                   className="processButton delete"
                   onClick={() => handleDeleteClick(process.id_process)}
