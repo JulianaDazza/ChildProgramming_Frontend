@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Eye, Edit, Trash2 } from "lucide-react"
+import { Eye, Edit, Trash2,Users } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "../ui/confirmModal"
 import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
@@ -139,6 +139,13 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" />
                     Editar
+                  </button>
+                </Link>
+
+                <Link href={`/activities/assign/${activity.id_activity}`}>
+                  <button className="processButton pdf">
+                    <Users className="h-4 w-4" />
+                    Asignar Roles
                   </button>
                 </Link>
 

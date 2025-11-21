@@ -26,9 +26,63 @@ export function ProcessForm() {
   })
 
   const [loading, setLoading] = useState(false)
-
-  // 🟩 Enviar datos al backend
+  
+  //Cambio para redirigir a Round
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    // Validaciones
+    const newErrors = {
+      name_process: !formData.name_process.trim(),
+      description_process: !formData.description_process.trim(),
+    }
+    setErrors(newErrors)
+
+    if (Object.values(newErrors).some(Boolean)) {
+      toastWarning("Por favor completa los campos obligatorios")
+      return
+    }
+
+    // Construimos FormData
+    const data = new FormData()
+    data.append("name_process", formData.name_process)
+    data.append("description_process", formData.description_process)
+    data.append("version_process", formData.version_process)
+
+    if (formData.imageFile) data.append("image", formData.imageFile)
+    else if (formData.imageUrl.trim()) data.append("imageUrl", formData.imageUrl)
+
+    setLoading(true)
+
+    try {
+      const response = await fetch("http://localhost:8080/api/colaborative_process/create", {
+        method: "POST",
+        body: data,
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        toastError("Error al crear el proceso: " + errorText)
+        return
+      }
+
+      const created = await response.json() // ⬅️ AQUÍ RECIBIMOS id_process
+
+      toastSuccess("Proceso creado correctamente")
+
+      // 🔵 REDIRECCIÓN AUTOMÁTICA A CREAR UNA RONDA
+      router.push(`/rounds/new?id_process=${created.id_process}`)
+
+    } catch (error) {
+      console.error("Error creando proceso:", error)
+      toastError("No se pudo conectar con el servidor")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  //Enviar datos al backend
+  /*const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // Validar campos requeridos
@@ -75,7 +129,7 @@ export function ProcessForm() {
     } finally {
       setLoading(false)
     }
-  }
+  }*/
 
   // 🧩 Manejar cambios de texto
   const handleChange = (field: string, value: string) => {
