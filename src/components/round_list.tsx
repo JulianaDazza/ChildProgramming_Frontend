@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Trash2, Eye} from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
 import Loading from "@/app/loading"
@@ -81,7 +81,13 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
               </p>
 
               <div className="processButtonGroup">
-                <Link href={`/rounds/${round.id_activity}/edit`}>
+                <Link href={`/rounds/view/${round.id_activity}`}>
+                  <button className="processButton view">
+                    <Eye className="h-4 w-4" />
+                    Ver
+                  </button>
+                </Link>
+                <Link href={`/rounds/edit/${round.id_activity}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
                   </button>
