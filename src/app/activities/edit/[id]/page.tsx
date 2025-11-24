@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation"
 import { RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { useAppToast } from "@/hooks/useAppToast"
 
 export default function ActivityEditPage() {
@@ -122,7 +121,6 @@ export default function ActivityEditPage() {
 
   return (
     <div className="processContainer">
-      <Sidebar />
 
       <main className="processMain">
         <div className="processHeader">

@@ -2,7 +2,7 @@
 
 import "../../global.css"
 import { RoundList } from "@/components/round_list"
-import { Plus, Search } from "lucide-react"
+import { Plus, Search, Repeat} from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -16,8 +16,8 @@ export default function RoundsListPage() {
         {/* Encabezado */}
         <div className="processHeader">
           <div className="processTitleRow">
-            <div className="catIconCircle small">
-              <img src="/roundicon.svg" alt="Icono de rondas" />
+            <div className="catIconCircle small flex items-center justify-center">
+              <Repeat className="w-5 h-5" stroke="white" />
             </div>
             <h1 className="heroTitle m-0">Rondas</h1>
           </div>

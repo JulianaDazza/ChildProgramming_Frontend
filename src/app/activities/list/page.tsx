@@ -1,7 +1,6 @@
 "use client"
 
 import "../../global.css"
-import { Sidebar } from "@/components/ui/sidebar"
 import { ActivityList } from "@/components/activity/activity_list"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
@@ -12,8 +11,6 @@ export default function ActivitiesListPage() {
 
   return (
     <div className="processContainer">
-      {/* 🔹 Sidebar lateral */}
-      <Sidebar />
 
       {/* 🔹 Contenido principal */}
       <main className="processMain">

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Sidebar } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import "../../global.css"
@@ -80,7 +79,6 @@ export default function ActivityDetailPage() {
 
   return (
     <div className="processContainer">
-      <Sidebar />
       <main className="processMain">
         <div className="contentWrapper">
           <div className="flex items-center gap-3 mb-6">
