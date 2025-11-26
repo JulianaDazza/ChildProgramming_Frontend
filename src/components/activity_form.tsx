@@ -19,7 +19,6 @@ export function ActivityForm() {
   const [formData, setFormData] = useState({
     name_activity: "",
     description_activity: "",
-    iterative: false,
     id_process: "",
     id_practice: "",
     id_thinklet: "",
@@ -141,22 +140,6 @@ export function ActivityForm() {
               value={formData.description_activity}
               onChange={(e) => handleChange("description_activity", e.target.value)}
             />
-          </div>
-
-          {/* Iterativa */}
-          <div className="formRow flex items-center">
-            <label className="text-gray-800 font-medium mr-3">Iterativa:</label>
-
-            <label className="toggleSwitch">
-              <input
-                type="checkbox"
-                checked={formData.iterative}
-                onChange={(e) => handleChange("iterative", e.target.checked)}
-              />
-              <span className="slider">
-                <span className="toggleText">{formData.iterative ? "SI" : "NO"}</span>
-              </span>
-            </label>
           </div>
 
           {/* Proceso obligatorio */}

@@ -12,7 +12,6 @@ interface Activity {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
 
   id_process?: number
   id_practice?: number
@@ -129,10 +128,6 @@ export function ActivityList({
                   Ronda asociada: {activity.parent_round_name}
                 </p>
               )}
-
-              <p className="text-xs text-gray-500 mb-4">
-                {activity.iterative ? "Iterativa" : "No iterativa"}
-              </p>
 
               <div className="processButtonGroup">
                 <Link href={`/activities/${activity.id_activity}`}>

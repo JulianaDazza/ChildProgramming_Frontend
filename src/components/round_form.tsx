@@ -26,14 +26,13 @@ export function RoundForm() {
     e.preventDefault()
 
     if (!id_process) {
-      toastError("No se recibió el ID del proceso.")
+      toastError("No se recibió el proceso.")
       return
     }
 
     const payload = {
       name_activity: formData.name_activity,
       description_activity: formData.description_activity,
-      iterative: true,
       id_process: Number(id_process),
       id_practice: null,
       id_thinklet: null,

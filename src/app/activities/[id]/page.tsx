@@ -10,7 +10,6 @@ interface ActivityDetail {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
   name_process?: string
   name_practice?: string
   name_thinklet?: string
@@ -104,10 +103,6 @@ export default function ActivityDetailPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-700 text-lg mb-4">
               <strong>Descripción:</strong> {activity.description_activity || "Sin descripción"}
-            </p>
-
-            <p className="text-gray-700 text-lg mb-2">
-              <strong>Iterativa:</strong> {activity.iterative ? "Sí" : "No"}
             </p>
 
             {activity.name_process && (
