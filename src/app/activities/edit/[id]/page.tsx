@@ -178,11 +178,11 @@ export default function ActivityEditPage() {
 
           {/* Proceso obligatorio */}
           <div className="formRow">
-            <label>Proceso: *</label>
+            <label>Proceso asociado:</label>
             <select
               value={formData.id_process}
-              onChange={(e) => handleChange("id_process", e.target.value)}
-              className={`formInput ${errors.id_process ? "inputError" : ""}`}
+              disabled
+              className="formInput bg-gray-100 cursor-not-allowed text-gray-600"
             >
               <option value="">Selecciona un proceso</option>
               {processes.map((p) => (
@@ -191,6 +191,12 @@ export default function ActivityEditPage() {
                 </option>
               ))}
             </select>
+             {/* Valor oculto para que SÍ se envíe al backend */}
+            <input
+              type="hidden"
+              name="id_process"
+              value={formData.id_process}
+            />
           </div>
 
           {/* Práctica */}
