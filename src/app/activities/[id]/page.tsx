@@ -14,6 +14,9 @@ interface ActivityDetail {
   name_process?: string
   name_practice?: string
   name_thinklet?: string
+
+  parent_round_id?: number | null
+  parent_round_name?: string | null
 }
 
 export default function ActivityDetailPage() {
@@ -124,6 +127,13 @@ export default function ActivityDetailPage() {
                 <strong>Thinklet:</strong> {activity.name_thinklet}
               </p>
             )}
+
+            {activity.parent_round_name && (
+              <p className="text-gray-700 text-lg mb-2">
+                <strong>Ronda asociada:</strong> {activity.parent_round_name}
+              </p>
+            )}
+
           </div>
         </div>
       </main>
