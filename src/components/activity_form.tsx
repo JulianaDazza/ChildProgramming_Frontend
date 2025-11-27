@@ -27,16 +27,78 @@ export function ActivityForm() {
   const [processes, setProcesses] = useState<any[]>([])
   const [practices, setPractices] = useState<any[]>([])
   const [thinklets, setThinklets] = useState<any[]>([])
+  const [roundName, setRoundName] = useState("");
+  const [roundId, setRoundId] = useState("");
+  const [rounds, setRounds] = useState<any[]>([])
+  const [filteredRounds, setFilteredRounds] = useState<any[]>([])
+
+
 
   ////////////////////////////////////////////////
   const params = useSearchParams()
   const id_process_param = params.get("id_process")
+  const round_id = params.get("round_id");
 
   useEffect(() => {
-    if (id_process_param) {
-      setFormData((prev) => ({ ...prev, id_process: id_process_param }))
+    const fetchRound = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/round/${round_id}`);
+        const data = await res.json();
+
+        setRoundId(round_id!);
+        setRoundName(data.name_activity);
+
+        // asignar el proceso que pertenece a esa ronda
+        setFormData((prev) => ({
+          ...prev,
+          id_process: String(data.id_process),
+        }));
+      } catch {
+        toastError("No se pudo obtener la información de la ronda");
+      }
+    };
+
+    if (round_id) {
+      fetchRound();
+      return;
     }
-  }, [id_process_param])
+
+    if (id_process_param) {
+      setFormData((prev) => ({
+        ...prev,
+        id_process: id_process_param,
+      }));
+    }
+  }, [round_id, id_process_param]);
+
+  //cargar rondas
+  useEffect(() => {
+    const fetchRounds = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/round/list")
+        const data = await res.json()
+        setRounds(data)
+      } catch {
+        toastError("Error al cargar rondas")
+      }
+    }
+
+    fetchRounds()
+  }, [])
+
+  //filtrar rondas según el proceso
+  useEffect(() => {
+    if (!formData.id_process) {
+      setFilteredRounds([])
+      return
+    }
+
+    // mostrar solo rondas del proceso seleccionado
+    setFilteredRounds(
+      rounds.filter(r => r.id_process == formData.id_process)
+    )
+  }, [formData.id_process, rounds])
+
   ////////////////////////////////////////////////
 
   // Cargar datos del backend
@@ -87,6 +149,7 @@ export function ActivityForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          parent_round_id: roundId ? Number(roundId) : null,
           id_process: Number(formData.id_process),
           id_practice: formData.id_practice ? Number(formData.id_practice) : null,
           id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
@@ -118,7 +181,7 @@ export function ActivityForm() {
           </div>
           <p>Completa la información para registrar una nueva actividad infantil</p>
         </div>
-
+        
         <form onSubmit={handleSubmit} className="processForm">
           {/* Nombre obligatorio */}
           <div className="formRow">
@@ -141,13 +204,21 @@ export function ActivityForm() {
               onChange={(e) => handleChange("description_activity", e.target.value)}
             />
           </div>
+          {/* Ronda */}
+          {roundId && (
+            <div className="formRow">
+              <label>Ronda seleccionada:</label>
+              <input className="formInput" value={roundName} disabled />
+            </div>
+          )}
 
           {/* Proceso obligatorio */}
           <div className="formRow">
-            <label>Proceso:</label>
+            <label>Proceso: *</label>
             <select
               className={`formInput ${errors.id_process ? "inputError" : ""}`}
               value={formData.id_process}
+              disabled={!!roundId}   // bloquear si viene por ronda
               onChange={(e) => setFormData({ ...formData, id_process: e.target.value })}
             >
               <option value="">Selecciona una proceso</option>
@@ -158,6 +229,32 @@ export function ActivityForm() {
               ))}
             </select>
           </div>
+          
+          {/* Selección manual de ronda padre (solo si no vino por parámetro) */}
+          {!roundId && (
+            <div className="formRow">
+              <label>Ronda padre:</label>
+              <select
+                className="formInput"
+                value={roundId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setRoundId(selectedId);
+
+                  const selectedRound = filteredRounds.find(r => r.id_activity == selectedId);
+                  setRoundName(selectedRound ? selectedRound.name_activity : "");
+                }}
+                disabled={!formData.id_process} // Deshabilitado si no ha seleccionado proceso
+              >
+                <option value="">Selecciona una ronda (opcional)</option>
+                {filteredRounds.map((r) => (
+                  <option key={r.id_activity} value={r.id_activity}>
+                    {r.name_activity}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Práctica */}
           <div className="formRow">

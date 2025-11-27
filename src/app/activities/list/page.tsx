@@ -14,6 +14,9 @@ export default function ActivitiesListPage() {
   const [processes, setProcesses] = useState<any[]>([])
   const [rounds, setRounds] = useState<any[]>([])
 
+  const [filteredProcesses, setFilteredProcesses] = useState<any[]>([])
+  const [filteredRounds, setFilteredRounds] = useState<any[]>([])
+
   useEffect(() => {
     fetchProcesses()
     fetchRounds()
@@ -23,13 +26,36 @@ export default function ActivitiesListPage() {
     const res = await fetch("http://localhost:8080/api/colaborative_process/list")
     const data = await res.json()
     setProcesses(data)
+    setFilteredProcesses(data)
   }
 
   const fetchRounds = async () => {
     const res = await fetch("http://localhost:8080/api/round/list")
     const data = await res.json()
     setRounds(data)
+    setFilteredRounds(data)
   }
+
+  // Filtros dependientes
+  useEffect(() => {
+    // Si seleccionas un proceso → filtra rondas
+    if (processFilter) {
+      setFilteredRounds(rounds.filter(r => r.id_process == processFilter))
+    } else {
+      setFilteredRounds(rounds)
+    }
+
+    // Si seleccionas una ronda → filtra procesos
+    if (roundFilter) {
+      const round = rounds.find(r => r.id_activity == roundFilter)
+      if (round) {
+        setFilteredProcesses(processes.filter(p => p.id_process == round.id_process))
+      }
+    } else {
+      setFilteredProcesses(processes)
+    }
+
+  }, [processFilter, roundFilter, processes, rounds])
 
   return (
     <div className="processContainer">
@@ -44,12 +70,10 @@ export default function ActivitiesListPage() {
               </div>
               <h1 className="heroTitle m-0">Actividades</h1>
             </div>
-            <p className="text-gray-600">
-              Consulta, busca o crea nuevas actividades colaborativas.
-            </p>
+            <p className="text-gray-600">Consulta, busca o crea nuevas actividades colaborativas.</p>
           </div>
 
-          {/* Barra de búsqueda + filtros + botón */}
+          {/* Barra de búsqueda + filtros + botón*/}
           <div className="actionBar flex flex-col gap-4">
 
             {/* Búsqueda */}
@@ -69,39 +93,42 @@ export default function ActivitiesListPage() {
               <Plus className="createButtonIcon" />
               Nueva Actividad
             </Link>
+
             {/* Filtros */}
             <div className="flex gap-4">
-              {/* Filtro por proceso */}
+
+              {/* Filtro de proceso */}
               <select
                 className="searchInput"
                 value={processFilter}
                 onChange={(e) => setProcessFilter(e.target.value)}
               >
                 <option value="">Filtrar por proceso</option>
-                {processes.map((p) => (
+                {filteredProcesses.map((p) => (
                   <option key={p.id_process} value={p.id_process}>
                     {p.name_process}
                   </option>
                 ))}
               </select>
 
-              {/* Filtro por ronda */}
+              {/* Filtro de ronda */}
               <select
                 className="searchInput"
                 value={roundFilter}
                 onChange={(e) => setRoundFilter(e.target.value)}
               >
                 <option value="">Filtrar por ronda</option>
-                {rounds.map((r) => (
+                {filteredRounds.map((r) => (
                   <option key={r.id_activity} value={r.id_activity}>
                     {r.name_activity}
                   </option>
                 ))}
               </select>
+
             </div>
           </div>
 
-          {/* Lista de actividades filtrada */}
+          {/* Lista */}
           <ActivityList
             searchTerm={searchTerm}
             processFilter={processFilter}
