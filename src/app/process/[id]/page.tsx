@@ -39,7 +39,6 @@ interface Activity {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
   parent_round_id?: number | null
   practice?: Practice | null
   thinklet?: Thinklet | null
@@ -50,7 +49,6 @@ interface Round {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
   round_status: string
 }
 
@@ -216,10 +214,6 @@ export default function ProcessDetailPage() {
                         <th className="pr-4 font-semibold">Estado:</th>
                         <td>{formatRoundStatus(roundGroup.round_status)}</td>
                       </tr>
-                      <tr>
-                        <th className="pr-4 font-semibold">Iterativa:</th>
-                        <td>{roundGroup.iterative ? "Sí" : "No"}</td>
-                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -241,10 +235,6 @@ export default function ProcessDetailPage() {
                           <tr>
                             <th className="pr-4 font-semibold">Descripción:</th>
                             <td>{a.description_activity}</td>
-                          </tr>
-                          <tr>
-                            <th className="pr-4 font-semibold">Iterativa:</th>
-                            <td>{a.iterative ? "Sí" : "No"}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -360,10 +350,6 @@ export default function ProcessDetailPage() {
                         <tr>
                           <th className="pr-4">Descripción:</th>
                           <td>{a.description_activity}</td>
-                        </tr>
-                        <tr>
-                          <th className="pr-4">Iterativa:</th>
-                          <td>{a.iterative ? "Sí" : "No"}</td>
                         </tr>
                       </tbody>
                     </table>

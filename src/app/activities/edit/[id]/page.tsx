@@ -16,7 +16,6 @@ export default function ActivityEditPage() {
   const [formData, setFormData] = useState({
     name_activity: "",
     description_activity: "",
-    iterative: false,
     id_process: "",
     id_practice: "",
     id_thinklet: "",
@@ -53,7 +52,6 @@ export default function ActivityEditPage() {
         setFormData({
           name_activity: data.name_activity || "",
           description_activity: data.description_activity || "",
-          iterative: data.iterative || false,
           id_process: data.id_process ? data.id_process.toString() : "",
           id_practice: data.id_practice ? data.id_practice.toString() : "",
           id_thinklet: data.id_thinklet ? data.id_thinklet.toString() : "",
@@ -97,7 +95,6 @@ export default function ActivityEditPage() {
         body: JSON.stringify({
           name_activity: formData.name_activity,
           description_activity: formData.description_activity,
-          iterative: formData.iterative,
           id_process: Number(formData.id_process),
           id_practice: formData.id_practice ? Number(formData.id_practice) : null,
           id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
@@ -152,28 +149,6 @@ export default function ActivityEditPage() {
               onChange={(e) => handleChange("description_activity", e.target.value)}
               className="formInput"
             />
-          </div>
-
-          {/* Iterativa */}
-          <div className="formRow flex items-center">
-            <label className="text-gray-800 font-medium mr-3">Iterativa:</label>
-
-            <label className="toggleSwitch">
-              <input
-                type="checkbox"
-                checked={formData.iterative}
-                disabled
-                readOnly
-                onChange={(e) =>
-                  setFormData({ ...formData, iterative: e.target.checked })
-                }
-              />
-              <span className="slider">
-                <span className="toggleText">
-                  {formData.iterative ? "YES" : "NO"}
-                </span>
-              </span>
-            </label>
           </div>
 
           {/* Proceso obligatorio */}

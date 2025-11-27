@@ -1,20 +1,26 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit, Trash2, Eye} from "lucide-react"
+import { Edit, Trash2, Eye } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "./ui/confirmModal"
 import Loading from "@/app/loading"
 
-// ⬅️ Interfaz corregida para que coincida con tu backend
 interface Round {
   id_activity: number
   name_activity: string
   description_activity: string
   round_status: string
+  id_process?: number
 }
 
-export function RoundList({ searchTerm }: { searchTerm?: string }) {
+export function RoundList({
+  searchTerm,
+  processFilter
+}: {
+  searchTerm?: string
+  processFilter?: string
+}) {
   const [rounds, setRounds] = useState<Round[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -27,10 +33,9 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
 
   const fetchRounds = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/round/list", { cache: "no-store" })
-      if (!response.ok) throw new Error("Error al obtener rondas")
-      const data = await response.json()
-      setRounds(data)
+      const res = await fetch("http://localhost:8080/api/round/list", { cache: "no-store" })
+      if (!res.ok) throw new Error("Error al obtener rondas")
+      setRounds(await res.json())
     } catch {
       setError("Error al cargar las rondas")
     } finally {
@@ -46,7 +51,7 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
   const confirmDelete = async () => {
     if (!selectedId) return
     await fetch(`http://localhost:8080/api/round/delete/${selectedId}`, {
-      method: "DELETE",
+      method: "DELETE"
     })
     setConfirmOpen(false)
     setSelectedId(null)
@@ -56,11 +61,16 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
   const normalize = (t?: string) =>
     (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
-  const filtered = rounds.filter(
-    (r) =>
+  const filtered = rounds.filter((r) => {
+    const matchesSearch =
       normalize(r.name_activity).includes(normalize(searchTerm)) ||
       normalize(r.description_activity).includes(normalize(searchTerm))
-  )
+
+    const matchesProcess =
+      processFilter ? r.id_process === Number(processFilter) : true
+
+    return matchesSearch && matchesProcess
+  })
 
   if (loading) return <Loading />
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>
@@ -73,6 +83,7 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
         {filtered.map((round) => (
           <div key={round.id_activity} className="processCardContainer">
             <div className="flex flex-col items-center p-6">
+
               <h2 className="text-lg font-semibold">{round.name_activity}</h2>
               <p className="text-gray-600 mb-4">{round.description_activity}</p>
 
@@ -83,10 +94,10 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
               <div className="processButtonGroup">
                 <Link href={`/rounds/view/${round.id_activity}`}>
                   <button className="processButton view">
-                    <Eye className="h-4 w-4" />
-                    Ver
+                    <Eye className="h-4 w-4" /> Ver
                   </button>
                 </Link>
+
                 <Link href={`/rounds/edit/${round.id_activity}`}>
                   <button className="processButton edit">
                     <Edit className="h-4 w-4" /> Editar
@@ -100,6 +111,7 @@ export function RoundList({ searchTerm }: { searchTerm?: string }) {
                   <Trash2 className="h-4 w-4" /> Eliminar
                 </button>
               </div>
+
             </div>
           </div>
         ))}

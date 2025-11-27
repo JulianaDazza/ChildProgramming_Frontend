@@ -18,7 +18,6 @@ export default function RoundEditPage() {
     description_activity: "",
     id_process: "",
     round_status: "",
-    iterative: true
   })
 
   const roundStatusList = [
@@ -42,8 +41,7 @@ export default function RoundEditPage() {
           name_activity: data.name_activity || "",
           description_activity: data.description_activity || "",
           id_process: data.id_process?.toString() || "",
-          round_status: data.round_status || "",
-          iterative: true
+          round_status: data.round_status || ""
         })
 
         setProcessName(data.name_process)
@@ -80,7 +78,6 @@ export default function RoundEditPage() {
           round_status: formData.round_status,
           id_practice: null,     // Siempre null → no se edita
           id_thinklet: null,     // Siempre null → no se edita
-          iterative: true
         })
       })
 
@@ -149,24 +146,6 @@ export default function RoundEditPage() {
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Iterativa (disabled) */}
-          <div className="formRow flex items-center">
-            <label className="text-gray-800 font-medium mr-3">Iterativa:</label>
-
-            <label className="toggleSwitch">
-              <input
-                type="checkbox"
-                checked={formData.iterative}
-                disabled
-              />
-              <span className="slider">
-                <span className="toggleText">
-                  {formData.iterative ? "YES" : "NO"}
-                </span>
-              </span>
-            </label>
           </div>
 
           {/* Proceso (solo lectura) */}
