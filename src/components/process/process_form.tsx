@@ -197,17 +197,37 @@ export function ProcessForm() {
           {/* Imagen: subir archivo o usar URL */}
           <div className="formRow">
             <label>Imagen:</label>
-            <div className="flex gap-2">
-              <input type="file" accept="image/*" onChange={handleFileChange} />
+
+            <div className="fileUploadWrapper">
+
+              {/* Botón bonito de archivo */}
+              <label className="fileUpload">
+                <Upload className="fileUploadIcon" />
+                Seleccionar imagen
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </label>
+
+              {/* Input para URL */}
               <input
                 type="text"
                 placeholder="O pega una URL de imagen"
                 value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value, imageFile: null })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    imageUrl: e.target.value,
+                    imageFile: null, // si escribe URL, limpiamos archivo
+                  })
+                }
                 className="formInput flex-1"
               />
             </div>
           </div>
+
 
           <div className="buttonGroup">
             <Link href="/">

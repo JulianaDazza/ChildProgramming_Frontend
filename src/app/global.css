@@ -1262,3 +1262,134 @@ html, body, main, .layoutMain, .processContainer, .contentWrapper {
 }
 
 
+/* ----------- BOTÓN ELIMINAR RONDA ----------- */
+.btnDeleteRound {
+  background-color: oklch(0.70 0.18 25 / 0.12);
+  color: #d11a2a;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #d11a2a22;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.btnDeleteRound:hover {
+  background-color: #d11a2a;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px #d11a2a55;
+}
+
+/* ----------- INPUT FILE BONITO ----------- */
+.fileUploadWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fileUpload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background-color: oklch(0.96 0.02 240);
+  border: 1px solid oklch(0.80 0.02 240);
+  border-radius: 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: oklch(0.30 0.03 250);
+  font-weight: 500;
+  transition: 0.18s ease;
+}
+
+.fileUpload:hover {
+  background-color: oklch(0.92 0.02 240);
+  border-color: oklch(0.55 0.22 250);
+}
+
+.fileUpload input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* Ícono del botón archivo */
+.fileUploadIcon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.8;
+}
+
+/* Botón/Select estilo input */
+.filterButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.65rem 1rem;
+  background: white;
+
+  border: 1px solid oklch(0.82 0.05 250);
+  border-radius: 0.75rem;
+
+  font-size: 0.9rem;
+  color: oklch(0.28 0.03 260);
+  cursor: pointer;
+
+  min-width: 180px;
+  height: 44px;
+
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hover igual que tus inputs */
+.filterButton {
+  position: relative;
+  display: inline-flex;     /* evita que crezca */
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+
+  padding: 0.25rem 0.55rem;
+  background: white;
+
+  border: 1px solid oklch(0.82 0.05 250);
+  border-radius: 0.5rem;
+
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: oklch(0.28 0.03 260);
+
+  cursor: pointer;
+  height: 30px;             /* altura compacta */
+  width: 90px;              /* 🔥 ancho fijo pequeño */
+  white-space: nowrap;
+
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.filterButton:hover {
+  background-color: oklch(0.97 0.02 250);
+  border-color: oklch(0.72 0.05 250);
+}
+
+.filterIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.filterSelect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

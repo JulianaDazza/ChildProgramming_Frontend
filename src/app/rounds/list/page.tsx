@@ -2,7 +2,7 @@
 
 import "../../global.css"
 import { RoundList } from "@/components/round_list"
-import { Plus, Search, Repeat } from "lucide-react"
+import { Plus, Search, Repeat, Filter  } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 
@@ -39,10 +39,11 @@ export default function RoundsListPage() {
           </p>
         </div>
 
-        <div className="actionBar flex flex-col gap-4">
+        {/* Búsqueda + Filtro en una sola fila */}
+        <div className="flex items-center gap-4">
 
-          {/* Búsqueda */}
-          <div className="searchContainer">
+          {/* BUSCADOR */}
+          <div className="searchContainer flex-grow max-w-[600px] w-auto">
             <Search className="searchIcon" />
             <input
               type="text"
@@ -52,24 +53,29 @@ export default function RoundsListPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-        </div>
-        <div className="actionBar flex flex-col gap-4">
-          {/* Filtro por proceso */}
-          <div className="flex gap-4">
+
+          {/* BOTÓN DE FILTRO */}
+          <label className="filterButton flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-md cursor-pointer text-sm font-medium">
+            <Filter className="w-4 h-4" />
+            Filtro
+
             <select
-              className="searchInput"
+              className="filterSelect absolute opacity-0 pointer-events-none"
               value={processFilter}
               onChange={(e) => setProcessFilter(e.target.value)}
             >
-              <option value="">Filtrar por proceso</option>
+              <option value="">Todos</option>
               {processes.map((p) => (
                 <option key={p.id_process} value={p.id_process}>
                   {p.name_process}
                 </option>
               ))}
             </select>
-          </div>
+          </label>
+
         </div>
+
+
 
         {/* LISTA DE RONDAS */}
         <RoundList 

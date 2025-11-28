@@ -225,19 +225,26 @@ export default function ProcessEditPage() {
 
           <div className="formRow">
             <label>Cambiar imagen:</label>
-            <div className="flex gap-2">
-              <input type="file" accept="image/*" onChange={handleFileChange} />
+            <div className="fileUploadWrapper">
+
+              <label className="fileUpload">
+                <Upload className="fileUploadIcon" />
+                Seleccionar archivo
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+              </label>
+
               <input
                 type="text"
                 placeholder="O pega una URL de imagen"
                 value={processData.image}
                 onChange={(e) => {
-                  setImageFile(null)
-                  handleChange("image", e.target.value)
+                  setImageFile(null);
+                  handleChange("image", e.target.value);
                 }}
                 className="formInput flex-1"
               />
             </div>
+
           </div>
 
           {/* ------------------- RONDAS ASOCIADAS ------------------- */}
@@ -264,11 +271,12 @@ export default function ProcessEditPage() {
                     <button
                       type="button"
                       onClick={() => setConfirmDeleteId(r.id_activity)}
-                      className="flex items-center gap-1 text-red-600 font-semibold hover:text-red-800 transition"
+                      className="btnDeleteRound"
                     >
                       <Trash2 className="h-4 w-4" />
                       Eliminar
                     </button>
+
                   </li>
                 ))}
               </ul>

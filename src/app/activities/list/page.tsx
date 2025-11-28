@@ -94,38 +94,43 @@ export default function ActivitiesListPage() {
               Nueva Actividad
             </Link>
 
-            {/* Filtros */}
-            <div className="flex gap-4">
+            {/* Filtros estilizados */}
+            <div className="flex flex-wrap gap-4">
 
-              {/* Filtro de proceso */}
-              <select
-                className="searchInput"
-                value={processFilter}
-                onChange={(e) => setProcessFilter(e.target.value)}
-              >
-                <option value="">Filtrar por proceso</option>
-                {filteredProcesses.map((p) => (
-                  <option key={p.id_process} value={p.id_process}>
-                    {p.name_process}
-                  </option>
-                ))}
-              </select>
+              {/* Filtro por proceso */}
+              <div className="relative">
+                <select
+                  className="filterSelectUI"
+                  value={processFilter}
+                  onChange={(e) => setProcessFilter(e.target.value)}
+                >
+                  <option value="">Filtrar por proceso</option>
+                  {filteredProcesses.map((p) => (
+                    <option key={p.id_process} value={p.id_process}>
+                      {p.name_process}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              {/* Filtro de ronda */}
-              <select
-                className="searchInput"
-                value={roundFilter}
-                onChange={(e) => setRoundFilter(e.target.value)}
-              >
-                <option value="">Filtrar por ronda</option>
-                {filteredRounds.map((r) => (
-                  <option key={r.id_activity} value={r.id_activity}>
-                    {r.name_activity}
-                  </option>
-                ))}
-              </select>
+              {/* Filtro por ronda */}
+              <div className="relative">
+                <select
+                  className="filterSelectUI"
+                  value={roundFilter}
+                  onChange={(e) => setRoundFilter(e.target.value)}
+                >
+                  <option value="">Filtrar por ronda</option>
+                  {filteredRounds.map((r) => (
+                    <option key={r.id_activity} value={r.id_activity}>
+                      {r.name_activity}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
             </div>
+
           </div>
 
           {/* Lista */}
