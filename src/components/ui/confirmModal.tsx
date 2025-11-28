@@ -6,9 +6,18 @@ interface ConfirmModalProps {
   message: string
   onConfirm: () => void
   onCancel: () => void
+  confirmText?: string   // 👈 Nuevo
+  cancelText?: string    // 👈 Nuevo
 }
 
-export function ConfirmModal({ title, message, onConfirm, onCancel }: ConfirmModalProps) {
+export function ConfirmModal({
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  confirmText = "Aceptar",   //Texto por defecto
+  cancelText = "Cancelar",   //Texto por defecto
+}: ConfirmModalProps) {
   return (
     <div className="modalOverlay">
       <div className="modalBox">
@@ -17,13 +26,14 @@ export function ConfirmModal({ title, message, onConfirm, onCancel }: ConfirmMod
 
         <div className="modalActions">
           <button onClick={onCancel} className="modalButton cancel">
-            Cancelar
+            {cancelText}
           </button>
           <button onClick={onConfirm} className="modalButton confirm">
-            Aceptar
+            {confirmText}
           </button>
         </div>
       </div>
     </div>
   )
 }
+

@@ -1,31 +1,49 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Eye, Edit, Trash2,Users } from "lucide-react"
+import { Eye, Edit, Trash2, Users } from "lucide-react"
 import Link from "next/link"
 import { ConfirmModal } from "../ui/confirmModal"
-import { useAppToast } from "@/hooks/useAppToast" // 👈 Importamos el hook
+import { useAppToast } from "@/hooks/useAppToast"
 import Loading from "@/app/loading"
 
-
+/* Interfaz actualizada según el DTO del backend */
 interface Activity {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
+
+  id_process?: number
+  id_practice?: number
+  id_thinklet?: number
+
   name_process?: string
   name_practice?: string
   name_thinklet?: string
+  parent_round_name?: string
+
+  parent_round_id?: number | null
 }
 
-export function ActivityList({ searchTerm }: { searchTerm?: string }) {
+/* Props con filtros */
+interface ActivityListProps {
+  searchTerm?: string
+  processFilter?: string
+  roundFilter?: string
+}
+
+export function ActivityList({
+  searchTerm,
+  processFilter,
+  roundFilter
+}: ActivityListProps) {
+
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
-  // 👇 Hook de notificaciones
   const { toastSuccess, toastError } = useAppToast()
 
   useEffect(() => {
@@ -40,7 +58,6 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
       setActivities(data)
       setError(null)
     } catch (err) {
-      console.error("Error al obtener actividades:", err)
       setError("Error al cargar las actividades")
       toastError("Error al cargar las actividades")
     } finally {
@@ -48,61 +65,44 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
     }
   }
 
-  const handleDeleteClick = (id: number) => {
-    setSelectedId(id)
-    setConfirmOpen(true)
-  }
-
-  const confirmDelete = async () => {
-    if (!selectedId) return
-    try {
-      const res = await fetch(`http://localhost:8080/api/child_activity/delete/${selectedId}`, {
-        method: "DELETE",
-      })
-
-      if (res.ok) {
-        toastSuccess("Actividad eliminada correctamente")
-        await fetchActivities()
-      } else {
-        toastError("Error al eliminar la actividad")
-      }
-    } catch (error) {
-      console.error("Error eliminando actividad:", error)
-      toastError("No se pudo conectar con el servidor")
-    } finally {
-      setConfirmOpen(false)
-      setSelectedId(null)
-    }
-  }
-
   const normalize = (text: string) =>
     text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
+  /* APLICACIÓN DE FILTROS */
   const filtered = activities.filter((act) => {
     const query = normalize(searchTerm || "")
-    return (
+
+    const matchesSearch =
       normalize(act.name_activity).includes(query) ||
       normalize(act.description_activity || "").includes(query)
-    )
+
+    const matchesProcess =
+      processFilter ? act.id_process === Number(processFilter) : true
+
+    const matchesRound =
+      roundFilter ? act.parent_round_id === Number(roundFilter) : true
+
+    return matchesSearch && matchesProcess && matchesRound
   })
 
-  if (loading)
-    return <Loading/>
+  /* Loading */
+  if (loading) return <Loading />
 
-  if (error)
-    return (
-      <div className="text-center py-10 text-red-500 text-lg">
-        {error}
-        <button className="processButton view ml-4" onClick={fetchActivities}>
-          Reintentar
-        </button>
-      </div>
-    )
+  /* Error */
+  if (error) return (
+    <div className="text-center py-10 text-red-500 text-lg">
+      {error}
+      <button className="processButton view ml-4" onClick={fetchActivities}>
+        Reintentar
+      </button>
+    </div>
+  )
 
-  if (activities.length === 0)
+  /* No actividades */
+  if (filtered.length === 0)
     return (
       <div className="text-center py-10 text-gray-500">
-        No hay actividades registradas.
+        No hay actividades para los filtros seleccionados.
       </div>
     )
 
@@ -123,9 +123,11 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
                 {activity.name_thinklet ? ` · Thinklet: ${activity.name_thinklet}` : ""}
               </p>
 
-              <p className="text-xs text-gray-500 mb-4">
-                {activity.iterative ? "Iterativa" : "No iterativa"}
-              </p>
+              {activity.parent_round_name && (
+                <p className="text-sm text-blue-600 mb-2">
+                  Ronda asociada: {activity.parent_round_name}
+                </p>
+              )}
 
               <div className="processButtonGroup">
                 <Link href={`/activities/${activity.id_activity}`}>
@@ -151,12 +153,16 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
 
                 <button
                   className="processButton delete"
-                  onClick={() => handleDeleteClick(activity.id_activity)}
+                  onClick={() => {
+                    setSelectedId(activity.id_activity)
+                    setConfirmOpen(true)
+                  }}
                 >
                   <Trash2 className="h-4 w-4" />
                   Eliminar
                 </button>
               </div>
+
             </div>
           </div>
         ))}
@@ -166,7 +172,15 @@ export function ActivityList({ searchTerm }: { searchTerm?: string }) {
         <ConfirmModal
           title="Eliminar actividad"
           message="¿Seguro que deseas eliminar esta actividad?"
-          onConfirm={confirmDelete}
+          onConfirm={async () => {
+            if (!selectedId) return
+            await fetch(`http://localhost:8080/api/child_activity/delete/${selectedId}`, {
+              method: "DELETE"
+            })
+            toastSuccess("Actividad eliminada correctamente")
+            fetchActivities()
+            setConfirmOpen(false)
+          }}
           onCancel={() => setConfirmOpen(false)}
         />
       )}

@@ -7,7 +7,7 @@ import "../../global.css"
 import { generateProcessPDF } from "@/lib/pdf_generator"
 import { useAppToast } from "@/hooks/useAppToast"
 
-// Tipos recomendados (ajusta según tu /lib/types.ts)
+// Tipos recomendados
 interface Pattern {
   id_pattern: number
   name_pattern: string
@@ -39,7 +39,7 @@ interface Activity {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
+  parent_round_id?: number | null
   practice?: Practice | null
   thinklet?: Thinklet | null
   assignedRoles?: Role[] | null
@@ -49,7 +49,6 @@ interface Round {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
   round_status: string
 }
 
@@ -77,7 +76,6 @@ export default function ProcessDetailPage() {
   const [loading, setLoading] = useState(true)
   const { toastError, toastInfo } = useAppToast()
 
-  // ⭐ ref para capturar la vista completa
   const pdfRef = useRef<HTMLDivElement>(null)
 
   // Consumir el endpoint
@@ -104,7 +102,7 @@ export default function ProcessDetailPage() {
 
     try {
       await generateProcessPDF(
-        pdfRef.current, 
+        pdfRef.current,
         `proceso-${process.name_process.replace(/\s+/g, "-")}`
       )
       toastInfo("📄 PDF generado correctamente")
@@ -137,12 +135,24 @@ export default function ProcessDetailPage() {
     )
   }
 
+  // ============================
+  // AGRUPAR ACTIVIDADES POR RONDA
+  // ============================
+  const actividadesSinRonda = process.activities.filter(a => !a.parent_round_id)
+  const actividadesPorRonda = process.rounds.map(round => ({
+    ...round,
+    actividades: process.activities.filter(a => a.parent_round_id === round.id_activity)
+  }))
+
+  // ============================
+  //     RENDER COMPLETO
+  // ============================
+
   return (
     <div className="processContainer">
-
       <main className="processMain">
 
-        {/* ⭐️ Contenedor completo para capturar en PDF */}
+        {/* CONTENIDO COMPLETO PARA PDF */}
         <div ref={pdfRef} className="contentWrapper detailCard">
 
           {/* Header */}
@@ -157,8 +167,10 @@ export default function ProcessDetailPage() {
           </div>
 
           <div className="processDetailContent">
-            
-            {/* Información general */}
+
+            {/* ============================= */}
+            {/*      BLOQUE 1: DETALLES       */}
+            {/* ============================= */}
             <div className="processInfoCard">
               <h2>Detalles generales</h2>
               <table className="processTable">
@@ -179,107 +191,71 @@ export default function ProcessDetailPage() {
               </table>
             </div>
 
-            {/* Rondas */}
-            <div className="processInfoCard">
-              <h2>Rondas</h2>
+            {/* ======================================================== */}
+            {/* BLOQUE 2..N : UNA RONDA → SUS ACTIVIDADES ASOCIADAS     */}
+            {/* ======================================================== */}
+            {actividadesPorRonda.map((roundGroup, idx) => (
+              <div key={roundGroup.id_activity} className="processInfoCard">
 
-              {process.rounds.length === 0 ? (
-                <p>No hay rondas registradas.</p>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {process.rounds.map((r) => (
-                    <div key={r.id_activity} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                {/* --- TITULO DE RONDA --- */}
+                <h2>
+                  Ronda {idx + 1}: {roundGroup.name_activity}
+                </h2>
 
-                      <table className="min-w-full text-left">
-                        <tbody>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Nombre:</th>
-                            <td className="text-gray-900">{r.name_activity}</td>
-                          </tr>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Descripción:</th>
-                            <td className="text-gray-900">{r.description_activity}</td>
-                          </tr>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Estado:</th>
-                            <td className="text-gray-900">{formatRoundStatus(r.round_status)}</td>
-                          </tr>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Es iterativa:</th>
-                            <td className="text-gray-900">{r.iterative ? "Sí" : "No"}</td>
-                          </tr>
-
-                        </tbody>
-                      </table>
-
-                    </div>
-                  ))}
+                {/* Info de la ronda */}
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                  <table className="min-w-full text-left">
+                    <tbody>
+                      <tr>
+                        <th className="pr-4 font-semibold">Descripción:</th>
+                        <td>{roundGroup.description_activity}</td>
+                      </tr>
+                      <tr>
+                        <th className="pr-4 font-semibold">Estado:</th>
+                        <td>{formatRoundStatus(roundGroup.round_status)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              )}
-            </div>
 
-            {/* Actividades */}
-            <div className="processInfoCard">
-              <h2>Actividades</h2>
+                {/* === ACTIVIDADES DE LA RONDA === */}
+                {roundGroup.actividades.length === 0 ? (
+                  <p className="italic text-gray-600">No hay actividades asociadas a esta ronda.</p>
+                ) : (
+                  roundGroup.actividades.map((a, index) => (
+                    <div key={a.id_activity} className="p-4 bg-gray-100 rounded-lg border mb-6">
 
-              {process.activities.length === 0 ? (
-                <p>No hay actividades registradas.</p>
-              ) : (
-                <div className="flex flex-col gap-6">
-
-                  {process.activities.map((a, index) => (
-                    <div key={a.id_activity} className="p-4 bg-gray-100 rounded-lg border">
-
-                      {/* ⭐ Subtítulo dinámico */}
                       <h3 className="text-xl font-bold text-blue-800 mb-3">
-                        Actividad {index + 1}
+                        Actividad {index + 1}: {a.name_activity}
                       </h3>
 
-                      {/* Tabla base de la actividad */}
+                      {/* Tabla base */}
                       <table className="min-w-full text-left">
                         <tbody>
                           <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Nombre:</th>
-                            <td className="text-gray-900">{a.name_activity}</td>
-                          </tr>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Descripción:</th>
-                            <td className="text-gray-900">{a.description_activity}</td>
-                          </tr>
-
-                          <tr>
-                            <th className="pr-4 font-semibold text-gray-700">Es iterativa:</th>
-                            <td className="text-gray-900">{a.iterative ? "Sí" : "No"}</td>
+                            <th className="pr-4 font-semibold">Descripción:</th>
+                            <td>{a.description_activity}</td>
                           </tr>
                         </tbody>
                       </table>
 
-                      {/* ======= PRÁCTICA ======= */}
+                      {/* PRÁCTICA */}
                       {a.practice && (
                         <div className="mt-4 p-4 bg-white rounded-lg border border-blue-300">
-                          <h3 className="text-center text-blue-700 font-bold text-lg mb-3">
-                            Práctica
-                          </h3>
+                          <h3 className="text-center text-blue-700 font-bold text-lg mb-3">Práctica</h3>
 
                           <table className="min-w-full text-left">
                             <tbody>
                               <tr>
-                                <th className="pr-4 font-semibold">Nombre:</th>
+                                <th className="pr-4">Nombre:</th>
                                 <td>{a.practice.name_practice}</td>
                               </tr>
-
                               <tr>
-                                <th className="pr-4 font-semibold">Tipo:</th>
+                                <th className="pr-4">Tipo:</th>
                                 <td>{a.practice.type_practice}</td>
                               </tr>
-
                               <tr>
-                                <th className="pr-4 font-semibold">Descripción:</th>
+                                <th className="pr-4">Descripción:</th>
                                 <td>{a.practice.description_practice}</td>
                               </tr>
                             </tbody>
@@ -287,29 +263,27 @@ export default function ProcessDetailPage() {
                         </div>
                       )}
 
-                      {/* ======= THINKLET ======= */}
+                      {/* THINKLET */}
                       {a.thinklet && (
                         <div className="mt-4 p-4 bg-white rounded-lg border border-green-300">
-                          <h3 className="text-center text-green-700 font-bold text-lg mb-3">
-                            Thinklet
-                          </h3>
+                          <h3 className="text-center text-green-700 font-bold text-lg mb-3">Thinklet</h3>
 
                           <table className="min-w-full text-left">
                             <tbody>
                               <tr>
-                                <th className="pr-4 font-semibold">Nombre:</th>
+                                <th className="pr-4">Nombre:</th>
                                 <td>{a.thinklet.name_thinklet}</td>
                               </tr>
-
                               <tr>
-                                <th className="pr-4 font-semibold">Descripción:</th>
+                                <th className="pr-4">Descripción:</th>
                                 <td>{a.thinklet.description_thinklet}</td>
                               </tr>
                             </tbody>
                           </table>
 
+                          {/* PATRÓN */}
                           {a.thinklet.pattern && (
-                            <div className="mt-4 p-3 bg-green-50 rounded border border-green-300">
+                            <div className="mt-3 p-3 bg-green-50 rounded border border-green-300">
                               <h4 className="text-center font-bold text-green-800 mb-2">
                                 Patrón
                               </h4>
@@ -317,12 +291,11 @@ export default function ProcessDetailPage() {
                               <table className="min-w-full text-left">
                                 <tbody>
                                   <tr>
-                                    <th className="pr-4 font-semibold">Nombre:</th>
+                                    <th className="pr-4">Nombre:</th>
                                     <td>{a.thinklet.pattern.name_pattern}</td>
                                   </tr>
-
                                   <tr>
-                                    <th className="pr-4 font-semibold">Descripción:</th>
+                                    <th className="pr-4">Descripción:</th>
                                     <td>{a.thinklet.pattern.description_pattern}</td>
                                   </tr>
                                 </tbody>
@@ -332,15 +305,15 @@ export default function ProcessDetailPage() {
                         </div>
                       )}
 
-                      {/* ======= ROLES ======= */}
+                      {/* ROLES */}
                       {a.assignedRoles && a.assignedRoles.length > 0 && (
                         <div className="mt-4 p-4 bg-white rounded-lg border border-purple-300">
                           <h3 className="text-center text-purple-700 font-bold text-lg mb-3">
                             Roles asignados
                           </h3>
 
-                          {a.assignedRoles.map((r, idx) => (
-                            <div key={`${r.id_role}-${idx}`} className="mb-3">
+                          {a.assignedRoles.map((r, idxR) => (
+                            <div key={idxR} className="mb-2">
                               <p><strong>Nombre:</strong> {r.name_role}</p>
                               <p><strong>Descripción:</strong> {r.description_role}</p>
                               <p><strong>Habilidades:</strong> {r.skills_role}</p>
@@ -350,16 +323,130 @@ export default function ProcessDetailPage() {
                       )}
 
                     </div>
-                  ))}
+                  ))
+                )}
 
-                </div>
-              )}
-            </div>
-            
+              </div>
+            ))}
+
+            {/* =========================================== */}
+            {/*   BLOQUE FINAL: ACTIVIDADES SIN RONDA        */}
+            {/* =========================================== */}
+            {actividadesSinRonda.length > 0 && (
+              <div className="processInfoCard">
+
+                <h2>Actividades sin ronda</h2>
+
+                {actividadesSinRonda.map((a, index) => (
+                  <div key={a.id_activity} className="p-4 bg-gray-100 rounded-lg border mb-6">
+
+                    <h3 className="text-xl font-bold text-blue-800 mb-3">
+                      Actividad {index + 1}: {a.name_activity}
+                    </h3>
+
+                    {/* Base */}
+                    <table className="min-w-full text-left">
+                      <tbody>
+                        <tr>
+                          <th className="pr-4">Descripción:</th>
+                          <td>{a.description_activity}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {/* PRÁCTICA */}
+                    {a.practice && (
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-blue-300">
+                        <h3 className="text-center text-blue-700 font-bold text-lg mb-3">Práctica</h3>
+
+                        <table className="min-w-full text-left">
+                          <tbody>
+                            <tr>
+                              <th className="pr-4">Nombre:</th>
+                              <td>{a.practice.name_practice}</td>
+                            </tr>
+                            <tr>
+                              <th className="pr-4">Tipo:</th>
+                              <td>{a.practice.type_practice}</td>
+                            </tr>
+                            <tr>
+                              <th className="pr-4">Descripción:</th>
+                              <td>{a.practice.description_practice}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* THINKLET */}
+                    {a.thinklet && (
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-green-300">
+                        <h3 className="text-center text-green-700 font-bold text-lg mb-3">Thinklet</h3>
+
+                        <table className="min-w-full text-left">
+                          <tbody>
+                            <tr>
+                              <th className="pr-4">Nombre:</th>
+                              <td>{a.thinklet.name_thinklet}</td>
+                            </tr>
+                            <tr>
+                              <th className="pr-4">Descripción:</th>
+                              <td>{a.thinklet.description_thinklet}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        {/* Patrón */}
+                        {a.thinklet.pattern && (
+                          <div className="mt-3 p-3 bg-green-50 rounded border border-green-300">
+                            <h4 className="text-center font-bold text-green-800 mb-2">
+                              Patrón
+                            </h4>
+
+                            <table className="min-w-full text-left">
+                              <tbody>
+                                <tr>
+                                  <th className="pr-4">Nombre:</th>
+                                  <td>{a.thinklet.pattern.name_pattern}</td>
+                                </tr>
+                                <tr>
+                                  <th className="pr-4">Descripción:</th>
+                                  <td>{a.thinklet.pattern.description_pattern}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ROLES */}
+                    {a.assignedRoles && a.assignedRoles.length > 0 && (
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-purple-300">
+                        <h3 className="text-center text-purple-700 font-bold text-lg mb-3">
+                          Roles asignados
+                        </h3>
+
+                        {a.assignedRoles.map((r, idxR) => (
+                          <div key={idxR} className="mb-2">
+                            <p><strong>Nombre:</strong> {r.name_role}</p>
+                            <p><strong>Descripción:</strong> {r.description_role}</p>
+                            <p><strong>Habilidades:</strong> {r.skills_role}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  </div>
+                ))}
+
+              </div>
+            )}
+
           </div>
         </div>
 
-        {/* Botones (estos NO se incluyen en el PDF) */}
+        {/* Botones NO incluidos en PDF */}
         <div className="processButtonRow">
           <button onClick={() => router.back()} className="btnBack">
             <ArrowLeft className="w-4 h-4" /> Volver

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Sidebar } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import "../../global.css"
@@ -11,10 +10,12 @@ interface ActivityDetail {
   id_activity: number
   name_activity: string
   description_activity: string
-  iterative: boolean
   name_process?: string
   name_practice?: string
   name_thinklet?: string
+
+  parent_round_id?: number | null
+  parent_round_name?: string | null
 }
 
 export default function ActivityDetailPage() {
@@ -80,7 +81,6 @@ export default function ActivityDetailPage() {
 
   return (
     <div className="processContainer">
-      <Sidebar />
       <main className="processMain">
         <div className="contentWrapper">
           <div className="flex items-center gap-3 mb-6">
@@ -105,10 +105,6 @@ export default function ActivityDetailPage() {
               <strong>Descripción:</strong> {activity.description_activity || "Sin descripción"}
             </p>
 
-            <p className="text-gray-700 text-lg mb-2">
-              <strong>Iterativa:</strong> {activity.iterative ? "Sí" : "No"}
-            </p>
-
             {activity.name_process && (
               <p className="text-gray-700 text-lg mb-2">
                 <strong>Proceso:</strong> {activity.name_process}
@@ -126,6 +122,13 @@ export default function ActivityDetailPage() {
                 <strong>Thinklet:</strong> {activity.name_thinklet}
               </p>
             )}
+
+            {activity.parent_round_name && (
+              <p className="text-gray-700 text-lg mb-2">
+                <strong>Ronda asociada:</strong> {activity.parent_round_name}
+              </p>
+            )}
+
           </div>
         </div>
       </main>
