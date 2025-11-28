@@ -17,7 +17,7 @@ interface Thinklet {
   id_thinklet: number
   name_thinklet: string
   description_thinklet: string
-  pattern?: Pattern | null // 👈 patrón opcional (puede venir null)
+  pattern?: Pattern | null 
 }
 
 export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
