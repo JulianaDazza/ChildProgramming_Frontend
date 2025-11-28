@@ -52,12 +52,6 @@ export default function RoundsListPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
-          {/* Botón crear ronda */}
-          <Link href="/rounds/new" className="createButton">
-            <Plus className="createButtonIcon" />
-            Nueva Ronda
-          </Link>
         </div>
         <div className="actionBar flex flex-col gap-4">
           {/* Filtro por proceso */}

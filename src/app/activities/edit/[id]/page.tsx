@@ -19,6 +19,7 @@ export default function ActivityEditPage() {
     id_process: "",
     id_practice: "",
     id_thinklet: "",
+    parent_round_id: "",
   })
 
   const [errors, setErrors] = useState({
@@ -29,22 +30,25 @@ export default function ActivityEditPage() {
   const [processes, setProcesses] = useState<any[]>([])
   const [practices, setPractices] = useState<any[]>([])
   const [thinklets, setThinklets] = useState<any[]>([])
+  const [rounds, setRounds] = useState<any[]>([])
 
-  // 🧩 Cargar datos iniciales
+  // Cargar datos iniciales
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [procRes, pracRes, thinkRes] = await Promise.all([
+        const [procRes, pracRes, thinkRes, roundRes] = await Promise.all([
           fetch("http://localhost:8080/api/colaborative_process/list"),
           fetch("http://localhost:8080/api/practice/list"),
           fetch("http://localhost:8080/api/thinklet/list"),
+          fetch("http://localhost:8080/api/round/list"),
         ])
 
         setProcesses(await procRes.json())
         setPractices(await pracRes.json())
         setThinklets(await thinkRes.json())
+        setRounds(await roundRes.json())
 
-        // ✅ Cargar actividad específica
+        // Cargar actividad específica
         const actRes = await fetch(`http://localhost:8080/api/child_activity/${id}`)
         if (!actRes.ok) throw new Error("Error al obtener la actividad")
         const data = await actRes.json()
@@ -55,6 +59,7 @@ export default function ActivityEditPage() {
           id_process: data.id_process ? data.id_process.toString() : "",
           id_practice: data.id_practice ? data.id_practice.toString() : "",
           id_thinklet: data.id_thinklet ? data.id_thinklet.toString() : "",
+          parent_round_id: data.parent_round_id ? data.parent_round_id.toString() : "",
         })
       } catch (error) {
         console.error("Error cargando datos:", error)
@@ -65,13 +70,13 @@ export default function ActivityEditPage() {
     if (id) fetchAll()
   }, [id])
 
-  // 🧩 Manejar cambios en los campos
+  // Manejar cambios en los campos
   const handleChange = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value })
     setErrors({ ...errors, [field]: false }) // limpia el error visual
   }
 
-  // 🧩 Guardar cambios
+  // Guardar cambios
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -98,6 +103,7 @@ export default function ActivityEditPage() {
           id_process: Number(formData.id_process),
           id_practice: formData.id_practice ? Number(formData.id_practice) : null,
           id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
+          parent_round_id: formData.parent_round_id ? Number(formData.parent_round_id) : null,
         }),
       })
 
@@ -171,6 +177,30 @@ export default function ActivityEditPage() {
               type="hidden"
               name="id_process"
               value={formData.id_process}
+            />
+          </div>
+
+          {/* Ronda padre (NO editable) */}
+          <div className="formRow">
+            <label>Ronda padre:</label>
+            <select
+              value={formData.parent_round_id}
+              disabled
+              className="formInput bg-gray-100 cursor-not-allowed text-gray-600"
+            >
+              <option value="">Sin ronda padre</option>
+              {rounds.map((r) => (
+                <option key={r.id_activity} value={r.id_activity}>
+                  {r.name_activity}
+                </option>
+              ))}
+            </select>
+
+            {/* Hidden para que SÍ se envíe */}
+            <input
+              type="hidden"
+              name="parent_round_id"
+              value={formData.parent_round_id}
             />
           </div>
 
