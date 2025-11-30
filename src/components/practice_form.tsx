@@ -81,7 +81,6 @@ export function PracticeForm() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
             <h1>Crear Nueva Práctica</h1>
           </div>
           <p>Completa la información para registrar una nueva práctica</p>

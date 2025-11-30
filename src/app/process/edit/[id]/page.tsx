@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { RefreshCcw, Upload, Image, Trash2 } from "lucide-react"
+import { RefreshCcw, Upload, Image, Trash2, Pencil } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { useAppToast } from "@/hooks/useAppToast"
@@ -163,7 +163,7 @@ export default function ProcessEditPage() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
+            <Pencil className="refreshIcon" />
             <h1>Editar Proceso</h1>
           </div>
           <p>Modifica la información del proceso colaborativo.</p>

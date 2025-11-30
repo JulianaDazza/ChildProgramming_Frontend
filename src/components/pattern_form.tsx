@@ -76,7 +76,6 @@ export function CollaborativePatternForm() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
             <h1>Crear Nuevo Patrón Colaborativo</h1>
           </div>
           <p>Completa la información para registrar un nuevo patrón colaborativo</p>

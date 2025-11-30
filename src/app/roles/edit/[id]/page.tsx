@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { RefreshCcw } from "lucide-react"
+import { Pencil, RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { Sidebar } from "@/components/ui/sidebar"
@@ -100,7 +100,7 @@ export default function RoleEditPage() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
+            <Pencil className="refreshIcon" />
             <h1>Editar Rol</h1>
           </div>
           <p>Modifica la información del rol seleccionado</p>

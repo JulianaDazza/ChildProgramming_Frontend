@@ -139,7 +139,7 @@ export default function RoundEditPage() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
+            <Pencil className="refreshIcon" />
             <h1>Editar Ronda</h1>
           </div>
           <p>Modifica los datos de la ronda seleccionada</p>
@@ -212,19 +212,19 @@ export default function RoundEditPage() {
                       <p className="font-semibold">{act.name_activity}</p>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="activityActions">
                       <Link href={`/activities/edit/${act.id_activity}`}>
-                        <button type="button" className="text-blue-600 hover:text-blue-800">
-                          <Pencil />
+                        <button type="button" className="btnIconEdit">
+                          <Pencil size={18} />
                         </button>
                       </Link>
 
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteId(act.id_activity)}
-                        className="text-red-600 hover:text-red-800"
+                        className="btnIconDelete"
                       >
-                        <Trash2 />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </li>
@@ -232,11 +232,12 @@ export default function RoundEditPage() {
               </ul>
             )}
             <Link href={`/activities/new?round_id=${id}`}>
-              <button className="btnAdd flex items-center gap-2">
-                <PlusCircle size={18} />
+              <button className="btnPrimary flex items-center gap-2">
+                <PlusCircle size={15} />
                 Nueva Actividad
               </button>
             </Link>
+
           </div>
 
           <hr className="my-10" />

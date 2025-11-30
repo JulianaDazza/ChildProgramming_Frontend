@@ -6,6 +6,8 @@ import { ArrowLeft, FileText } from "lucide-react"
 import "../../global.css"
 import { generateProcessPDF } from "@/lib/pdf_generator"
 import { useAppToast } from "@/hooks/useAppToast"
+import Image from "next/image"
+
 
 // Tipos recomendados
 interface Pattern {
@@ -158,9 +160,16 @@ export default function ProcessDetailPage() {
           {/* Header */}
           <div className="processHeader">
             <div className="processTitleRow">
-              <div className="catIconCircle small">
-                <img src="/caticon.svg" alt="Icono proceso" />
+              <div className="catIconCircle">
+                <Image
+                  src="/caticon.svg"
+                  alt="Cat Icon"
+                  width={60}
+                  height={60}
+                  unoptimized
+                />
               </div>
+
               <h1 className="heroTitle m-0">{process.name_process}</h1>
             </div>
             <p className="text-gray-600">Información completa del proceso colaborativo.</p>

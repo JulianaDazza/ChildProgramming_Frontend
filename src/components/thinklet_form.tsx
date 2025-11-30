@@ -97,7 +97,6 @@ export function ThinkletForm() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
             <h1>Crear Nuevo Thinklet</h1>
           </div>
           <p>Completa la información para registrar un nuevo thinklet</p>

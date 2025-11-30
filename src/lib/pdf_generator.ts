@@ -1,35 +1,52 @@
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 
-export async function generateProcessPDF(element: HTMLDivElement, fileName: string) {
-
-  // Capturar el elemento como imagen
-  const canvas = await html2canvas(element, {
-    scale: 2,    // Mejor resolución
-    useCORS: true
-  })
-
-  const imgData = canvas.toDataURL("image/png")
+export async function generateProcessPDF(
+  element: HTMLDivElement,
+  fileName: string
+) {
   const pdf = new jsPDF("p", "mm", "a4")
 
   const pdfWidth = pdf.internal.pageSize.getWidth()
   const pdfHeight = pdf.internal.pageSize.getHeight()
 
-  // Calcular tamaño proporcional
-  const imgWidth = pdfWidth
-  const imgHeight = (canvas.height * pdfWidth) / canvas.width
+  const canvas = await html2canvas(element, {
+    scale: 3, // mayor nitidez
+    useCORS: true,
+    scrollX: 0,
+    scrollY: -window.scrollY,
+    windowWidth: element.scrollWidth,
+  })
 
-  let heightLeft = imgHeight
-  let position = 0
+  const imgData = canvas.toDataURL("image/png")
 
-  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-  heightLeft -= pdfHeight
+  // márgenes recomendados
+  const margin = 10
+  const availableWidth = pdfWidth - margin * 2
 
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight
+  const imgWidth = availableWidth
+  const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+  let positionY = margin
+  let remainingHeight = imgHeight
+
+  // Primera página
+  pdf.addImage(imgData, "PNG", margin, positionY, imgWidth, imgHeight)
+  remainingHeight -= pdfHeight - margin * 2
+
+  // Páginas siguientes
+  while (remainingHeight > 0) {
     pdf.addPage()
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-    heightLeft -= pdfHeight
+    const offset = imgHeight - remainingHeight
+    pdf.addImage(
+      imgData,
+      "PNG",
+      margin,
+      margin - offset,
+      imgWidth,
+      imgHeight
+    )
+    remainingHeight -= pdfHeight - margin * 2
   }
 
   pdf.save(`${fileName}.pdf`)

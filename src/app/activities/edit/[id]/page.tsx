@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { RefreshCcw } from "lucide-react"
+import { Pencil, RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import "../../../global.css"
 import { useAppToast } from "@/hooks/useAppToast"
@@ -32,7 +32,7 @@ export default function ActivityEditPage() {
   const [thinklets, setThinklets] = useState<any[]>([])
   const [rounds, setRounds] = useState<any[]>([])
 
-  // Cargar datos iniciales
+  // Cargar datos
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -56,10 +56,10 @@ export default function ActivityEditPage() {
         setFormData({
           name_activity: data.name_activity || "",
           description_activity: data.description_activity || "",
-          id_process: data.id_process ? data.id_process.toString() : "",
-          id_practice: data.id_practice ? data.id_practice.toString() : "",
-          id_thinklet: data.id_thinklet ? data.id_thinklet.toString() : "",
-          parent_round_id: data.parent_round_id ? data.parent_round_id.toString() : "",
+          id_process: data.id_process?.toString() || "",
+          id_practice: data.id_practice?.toString() || "",
+          id_thinklet: data.id_thinklet?.toString() || "",
+          parent_round_id: data.parent_round_id?.toString() || "",
         })
       } catch (error) {
         console.error("Error cargando datos:", error)
@@ -70,17 +70,16 @@ export default function ActivityEditPage() {
     if (id) fetchAll()
   }, [id])
 
-  // Manejar cambios en los campos
+  // Manejar cambios
   const handleChange = (field: string, value: string | boolean) => {
     setFormData({ ...formData, [field]: value })
-    setErrors({ ...errors, [field]: false }) // limpia el error visual
+    setErrors({ ...errors, [field]: false })
   }
 
-  // Guardar cambios
+  // Guardar
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Validar campos requeridos
     const newErrors = {
       name_activity: !formData.name_activity.trim(),
       id_process: !formData.id_process,
@@ -94,18 +93,21 @@ export default function ActivityEditPage() {
 
     setLoading(true)
     try {
-      const response = await fetch(`http://localhost:8080/api/child_activity/update/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name_activity: formData.name_activity,
-          description_activity: formData.description_activity,
-          id_process: Number(formData.id_process),
-          id_practice: formData.id_practice ? Number(formData.id_practice) : null,
-          id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
-          parent_round_id: formData.parent_round_id ? Number(formData.parent_round_id) : null,
-        }),
-      })
+      const response = await fetch(
+        `http://localhost:8080/api/child_activity/update/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name_activity: formData.name_activity,
+            description_activity: formData.description_activity,
+            id_process: Number(formData.id_process),
+            id_practice: formData.id_practice ? Number(formData.id_practice) : null,
+            id_thinklet: formData.id_thinklet ? Number(formData.id_thinklet) : null,
+            parent_round_id: formData.parent_round_id ? Number(formData.parent_round_id) : null,
+          }),
+        }
+      )
 
       if (response.ok) {
         toastSuccess("Actividad actualizada correctamente")
@@ -128,14 +130,15 @@ export default function ActivityEditPage() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
+            <Pencil className="refreshIcon" />
             <h1>Editar Actividad</h1>
           </div>
           <p>Modifica los datos de la actividad seleccionada</p>
         </div>
 
         <form onSubmit={handleSubmit} className="processForm space-y-5">
-          {/* Nombre obligatorio */}
+
+          {/* Nombre */}
           <div className="formRow">
             <label>Nombre de la actividad: *</label>
             <input
@@ -146,7 +149,7 @@ export default function ActivityEditPage() {
             />
           </div>
 
-          {/* Descripción opcional */}
+          {/* Descripción */}
           <div className="formRow">
             <label>Descripción:</label>
             <input
@@ -157,7 +160,7 @@ export default function ActivityEditPage() {
             />
           </div>
 
-          {/* Proceso obligatorio */}
+          {/* Proceso */}
           <div className="formRow">
             <label>Proceso asociado:</label>
             <select
@@ -172,15 +175,10 @@ export default function ActivityEditPage() {
                 </option>
               ))}
             </select>
-             {/* Valor oculto para que SÍ se envíe al backend */}
-            <input
-              type="hidden"
-              name="id_process"
-              value={formData.id_process}
-            />
+            <input type="hidden" name="id_process" value={formData.id_process} />
           </div>
 
-          {/* Ronda padre (NO editable) */}
+          {/* Ronda padre */}
           <div className="formRow">
             <label>Ronda padre:</label>
             <select
@@ -195,13 +193,7 @@ export default function ActivityEditPage() {
                 </option>
               ))}
             </select>
-
-            {/* Hidden para que SÍ se envíe */}
-            <input
-              type="hidden"
-              name="parent_round_id"
-              value={formData.parent_round_id}
-            />
+            <input type="hidden" name="parent_round_id" value={formData.parent_round_id} />
           </div>
 
           {/* Práctica */}
@@ -258,6 +250,14 @@ export default function ActivityEditPage() {
             </button>
           </div>
         </form>
+
+        {/* BOTÓN DEBAJO DEL CONTENEDOR */}
+        <div className="backButtonWrapper">
+          <Link href="/activities/list">
+            <button className="backButton">Volver</button>
+          </Link>
+        </div>
+
       </main>
     </div>
   )

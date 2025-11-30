@@ -110,10 +110,6 @@ export function ThinkletList({ searchTerm }: { searchTerm?: string }) {
         {filtered.map((thinklet) => (
           <div key={thinklet.id_thinklet} className="processCardContainer">
             <div className="flex flex-col items-center p-6 text-center">
-              <div className="catIconCircle mb-3">
-                <img src="/caticon.svg" alt="Cat Icon" />
-              </div>
-
               <h2 className="text-lg font-semibold text-gray-800 mb-2">
                 {thinklet.name_thinklet}
               </h2>

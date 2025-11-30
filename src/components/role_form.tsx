@@ -78,7 +78,6 @@ export function RoleForm() {
       <main className="processMain">
         <div className="processHeader">
           <div className="processTitle">
-            <RefreshCcw className="refreshIcon" />
             <h1>Crear Nuevo Rol</h1>
           </div>
           <p>Completa la información para registrar un nuevo rol colaborativo</p>
